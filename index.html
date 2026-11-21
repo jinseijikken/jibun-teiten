@@ -1,0 +1,158 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <!-- 安全対策：外部への通信を禁止し、このフォルダ内のスクリプトとGoogle Fontsだけを許可 -->
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self'; connect-src 'none'; form-action 'none'; base-uri 'none'">
+  <meta name="referrer" content="no-referrer">
+  <meta name="theme-color" content="#172139">
+  <!-- 人生実験サイトの favicon を共用（公開後は同じドメインなので / から参照できる） -->
+  <link rel="icon" type="image/png" href="/assets/images/favicon.png">
+  <meta property="og:title" content="じぶん定点観測 | 人生実験">
+  <meta property="og:description" content="8つの領域で、今の自分を測る。変化を知る。">
+  <meta property="og:type" content="website">
+  <title>じぶん定点観測 | 人生実験</title>
+  <meta name="description" content="「理想の人生にどれだけ近いか」ではなく、「今の自分にどれだけ無理が生じているか」を測る。人生実験のセルフチェック。">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Zen+Kaku+Gothic+New:wght@400;500&family=Zen+Old+Mincho:wght@400;700&display=swap">
+  <link rel="stylesheet" href="style.css">
+  <script src="data.js" defer></script>
+  <script src="image.js" defer></script>
+  <script src="app.js" defer></script>
+</head>
+<body>
+  <header class="bar">
+    <div class="wrap">
+      <a class="bar-title" href="./">じぶん定点観測</a>
+      <a class="bar-site" href="https://jinseijikken.github.io/">人生実験</a>
+    </div>
+  </header>
+
+  <main class="wrap">
+    <!-- ① はじめに -->
+    <section id="intro" class="screen">
+      <p class="catch">何がしんどいのか、わからないときに。</p>
+      <h1 class="name">じぶん定点観測</h1>
+      <p class="lead">8つの領域で、今の自分を測る。<span class="nobr">変化を知る。</span></p>
+      <ul class="domains" id="domain-list" aria-label="8つの領域"></ul>
+      <p class="concept">「理想の人生にどれだけ近いか」ではなく、<br>「今の自分にどれだけ無理が生じているか」<span class="nobr">を測ります。</span></p>
+      <div class="method">
+        <p>問いに、それぞれ「1～5点」で答えてください。<br>（1＝まったくそう思わない、5＝非常にそう思う）</p>
+      </div>
+      <p class="note">全24問／回答はこの端末のブラウザの中だけに保存され、どこにも送信されません。</p>
+      <p class="note" id="last-info" hidden></p>
+      <div class="actions">
+        <button type="button" class="btn primary" id="start">はじめる</button>
+        <button type="button" class="btn ghost" id="show-last" hidden>前回の観測を見る</button>
+      </div>    </section>
+
+    <!-- ①' 前回の一歩、やってみましたか？（前回カードを受け取っていて、まだ答えていないときだけ） -->
+    <section id="followup" class="screen" hidden>
+      <p class="note" id="fu-since"></p>
+      <h2 class="title">前回の一歩、<br>やってみましたか？</h2>
+      <div class="fu-card" id="fu-card">
+        <p class="fu-title" id="fu-title"></p>
+        <p class="card-action">Action</p>
+        <p class="fu-step" id="fu-step"></p>
+      </div>
+      <div class="actions fu-options" id="fu-options"></div>
+    </section>
+
+    <!-- ② 問い -->
+    <section id="quiz" class="screen" hidden>
+      <div class="progress" aria-hidden="true"><span id="progress-bar"></span></div>
+      <p class="count"><span id="q-index">1</span> / <span id="q-total">24</span></p>
+      <h2 class="question" id="q-text" tabindex="-1"></h2>
+      <div class="scale" role="group" aria-label="1〜5点で回答">
+        <button type="button" class="score" data-value="1">1</button>
+        <button type="button" class="score" data-value="2">2</button>
+        <button type="button" class="score" data-value="3">3</button>
+        <button type="button" class="score" data-value="4">4</button>
+        <button type="button" class="score" data-value="5">5</button>
+      </div>
+      <div class="scale-labels" aria-hidden="true"><span>まったくそう思わない</span><span>非常にそう思う</span></div>
+      <div class="actions">
+        <button type="button" class="btn ghost" id="back">ひとつ戻る</button>
+      </div>
+    </section>
+
+    <!-- ③ 結果 -->
+    <section id="result" class="screen" hidden>
+      <p class="eyebrow">OBSERVATION</p>
+      <h2 class="title" id="result-title">今回の観測</h2>
+      <p class="note" id="result-date"></p>
+
+      <div class="chart-box">
+        <svg id="chart" viewBox="0 0 360 340" role="img" aria-label="8つの領域の点数のレーダーチャート"></svg>
+        <div class="legend" id="legend" hidden>
+          <span class="lg now">今回</span><span class="lg prev">前回</span>
+        </div>
+      </div>
+
+      <table class="scores">
+        <thead><tr><th scope="col">領域</th><th scope="col">点数</th><th scope="col" id="th-diff">前回比</th></tr></thead>
+        <tbody id="score-rows"></tbody>
+      </table>
+
+      <!-- 観測の記録：領域ごとの推移（小さな折れ線を8つ） -->
+      <div class="history">
+        <p class="eyebrow">観測の記録</p>
+        <p class="note" id="history-range"></p>
+        <div class="spark-grid" id="spark-grid"></div>
+        <p class="note" id="history-empty" hidden>2回以上観測すると、ここに領域ごとの変化が表示されます。</p>
+        <div class="steps" id="steps" hidden>
+          <p class="steps-head">これまでの一歩</p>
+          <ul id="steps-list"></ul>
+        </div>
+      </div>
+
+      <div class="stuck">
+        <p class="eyebrow">いま滞っているところ</p>
+        <p class="stuck-names" id="stuck-names"></p>
+      </div>
+
+      <!-- リフレクションカード：画像ができたら差し替え予定 -->
+      <div class="card-area">
+        <div class="card-scene">
+          <article class="card" id="card">
+            <!-- 表：問い -->
+            <div class="face front" id="card-front">
+              <p class="card-num" id="card-num"></p>
+              <h3 class="card-title" id="card-title"></h3>
+              <p class="card-q" id="card-q"></p>
+              <p class="card-domain" id="card-domain"></p>
+            </div>
+            <!-- 裏：整える一歩 -->
+            <div class="face back" id="card-back" aria-hidden="true">
+              <p class="card-num" id="card-num-b"></p>
+              <p class="card-title small" id="card-title-b"></p>
+              <p class="card-action">Action</p>
+              <p class="card-step" id="card-step-text"></p>
+              <p class="card-domain" id="card-domain-b"></p>
+            </div>
+          </article>
+        </div>
+        <div class="actions">
+          <button type="button" class="btn primary" id="reveal" aria-controls="card">整える一歩を見る</button>
+          <button type="button" class="btn ghost" id="redraw">もう1枚引く</button>
+        </div>
+      </div>
+
+      <div class="save-box">
+        <button type="button" class="btn primary" id="save-image">結果を画像で保存</button>
+        <p class="note" id="save-msg" role="status"></p>
+      </div>
+
+      <div class="actions end">
+        <button type="button" class="btn ghost" id="restart">もう一度観測する</button>
+        <button type="button" class="btn text" id="clear">保存した記録を消す</button>
+      </div>    </section>
+  </main>
+
+  <footer class="foot">
+    <div class="wrap"><a href="https://jinseijikken.github.io/">人生実験のサイトへ</a><small>© JINSEI JIKKEN</small></div>
+  </footer>
+</body>
+</html>

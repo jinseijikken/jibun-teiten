@@ -1,0 +1,8 @@
+# ローカル専用（公開しない）
+CLAUDE.md
+
+# OS・エディタが生成するファイル
+.DS_Store
+Thumbs.db
+desktop.ini
+.claude/

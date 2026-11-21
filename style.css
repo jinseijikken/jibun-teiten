@@ -1,0 +1,338 @@
+/* =========================================================
+   滞りセルフチェックツール
+   配色・書体は人生実験サイト（jinseijikken.github.io）に合わせる
+   ========================================================= */
+:root {
+  --ink: #20201f;
+  --body: #555350;
+  --muted: #6b6668;
+  --label: #8a8273;
+  --gold: #c7aa6b;
+  --card-gold: #ba9f50;
+  --line: #dcd9d2;
+  --paper: #f9f8f5;
+  --white: #fff;
+  --night: #172139;
+  --serif: "Zen Old Mincho", "Yu Mincho", "YuMincho", "Hiragino Mincho ProN", serif;
+  --sans: "Zen Kaku Gothic New", "Hiragino Kaku Gothic ProN", "Yu Gothic", "YuGothic", sans-serif;
+  --roman: "Zen Old Mincho", Georgia, serif;
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+[hidden] { display: none !important; }
+body {
+  margin: 0;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--sans);
+  font-size: 16px;
+  line-height: 1.9;
+}
+.wrap { width: min(100% - 40px, 640px); margin-inline: auto; }
+a { color: inherit; }
+.nobr { display: inline-block; }
+button { font: inherit; color: inherit; }
+:focus-visible { outline: 2px solid #777; outline-offset: 3px; }
+
+/* ---------- ヘッダー・フッター ---------- */
+.bar { background: var(--night); color: var(--white); }
+.bar .wrap { min-height: 56px; display: flex; align-items: center; justify-content: space-between; gap: 16px; }
+.bar-site { font-family: var(--serif); font-size: 13px; letter-spacing: .12em; text-decoration: none; opacity: .8; }
+.bar-site:hover { opacity: 1; text-decoration: underline; text-underline-offset: 4px; }
+.bar-title { font-family: var(--serif); font-size: 16px; letter-spacing: .12em; text-decoration: none; }
+.bar-title:hover { opacity: .75; }
+.bar a:focus-visible { outline-color: var(--white); }
+.foot { padding: 40px 0 48px; color: #7a766f; font-size: 12px; text-align: center; }
+.foot a { display: inline-block; margin-bottom: 10px; font-size: 13px; text-underline-offset: 4px; }
+.foot small { display: block; font-family: var(--roman); letter-spacing: .1em; }
+
+/* 結果を画像で保存 */
+.save-box { margin-top: 48px; text-align: center; }
+.save-box .note { min-height: 1.9em; }
+
+/* ---------- 共通 ---------- */
+.screen { padding: 56px 0 24px; }
+.eyebrow {
+  margin: 0 0 14px;
+  font-family: var(--roman);
+  font-size: 13px;
+  line-height: 1;
+  letter-spacing: .2em;
+  color: var(--muted);
+}
+.title {
+  margin: 0;
+  font-family: var(--serif);
+  font-size: 28px;
+  font-weight: 700;
+  line-height: 1.5;
+  letter-spacing: .1em;
+}
+/* はじめに：キャッチ（小）→ 名前（大）→ 説明 */
+.catch {
+  margin: 0;
+  font-family: var(--serif);
+  font-size: 17px;
+  line-height: 1.8;
+  letter-spacing: .1em;
+  color: var(--muted);
+}
+.name {
+  margin: 10px 0 0;
+  font-family: var(--serif);
+  font-size: 34px;
+  font-weight: 700;
+  line-height: 1.5;
+  letter-spacing: .14em;
+}
+.lead { margin: 22px 0 0; font-family: var(--serif); font-size: 18px; line-height: 1.9; letter-spacing: .08em; color: var(--ink); }
+.domains {
+  display: grid;
+  grid-template-columns: repeat(4, max-content);
+  gap: 8px 22px;
+  margin: 18px 0 0;
+  padding: 0;
+  list-style: none;
+  font-size: 14px;
+  letter-spacing: .06em;
+  color: var(--body);
+}
+.domains .dot { margin-right: 8px; }
+.concept { margin: 20px 0 0; font-size: 13px; line-height: 1.9; letter-spacing: .04em; color: var(--muted); }
+
+.note { margin: 12px 0 0; font-size: 13px; color: var(--muted); letter-spacing: .04em; }
+.method {
+  margin: 36px 0 28px;
+  padding: 24px 26px;
+  background: var(--white);
+  border: 1px solid var(--line);
+}
+.method p { margin: 0; font-size: 15px; line-height: 2; letter-spacing: .04em; color: var(--body); }
+
+.actions { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 32px; }
+.actions.end { margin-top: 56px; padding-top: 32px; border-top: 1px solid var(--line); }
+.btn {
+  min-height: 48px;
+  padding: 0 28px;
+  border: 1px solid var(--night);
+  background: transparent;
+  cursor: pointer;
+  letter-spacing: .08em;
+}
+.btn.primary { background: var(--night); color: var(--white); }
+.btn.primary:hover { background: #26324f; }
+.btn.ghost:hover { background: rgba(23, 33, 57, .06); }
+.btn.text { border-color: transparent; padding: 0 8px; font-size: 13px; color: var(--muted); text-decoration: underline; text-underline-offset: 4px; }
+
+/* ---------- 問い ---------- */
+.is-quiz .bar, .is-quiz .foot { display: none; }
+.is-quiz #quiz { padding-top: 40px; }
+.progress { height: 3px; background: var(--line); }
+.progress span { display: block; height: 100%; width: 0; background: var(--gold); transition: width .25s; }
+.count { margin: 20px 0 0; font-family: var(--roman); font-size: 14px; color: var(--label); letter-spacing: .08em; }
+.question {
+  min-height: 5.6em;
+  margin: 18px 0 32px;
+  font-family: var(--serif);
+  font-size: 22px;
+  font-weight: 700;
+  line-height: 1.8;
+  letter-spacing: .06em;
+  outline: none;
+}
+.scale { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; }
+.score {
+  aspect-ratio: 1;
+  max-height: 72px;
+  border: 1px solid var(--label);
+  border-radius: 50%;
+  background: var(--white);
+  font-family: var(--roman);
+  font-size: 20px;
+  cursor: pointer;
+  transition: background .15s, color .15s;
+}
+.score:hover { background: #f1eee6; }
+.score.selected { background: var(--night); border-color: var(--night); color: var(--white); }
+.scale-labels { display: flex; justify-content: space-between; margin-top: 10px; font-size: 12px; color: var(--muted); }
+
+/* ---------- 結果 ---------- */
+.chart-box { margin: 28px 0 8px; padding: 12px 8px; background: var(--white); border: 1px solid var(--line); }
+#chart { display: block; width: 100%; max-width: 420px; margin: 0 auto; }
+#chart .grid { fill: none; stroke: var(--line); stroke-width: 1; }
+#chart .axis { stroke: var(--line); stroke-width: 1; }
+#chart .label { font-family: var(--sans); font-size: 13px; fill: var(--body); }
+#chart .now { fill: rgba(23, 33, 57, .14); stroke: var(--night); stroke-width: 2; stroke-linejoin: round; }
+#chart .prev { fill: none; stroke: var(--gold); stroke-width: 1.5; stroke-dasharray: 5 4; }
+#chart .pt { stroke: var(--white); stroke-width: 1.5; }
+.legend { display: flex; justify-content: center; gap: 20px; padding-bottom: 6px; font-size: 12px; color: var(--muted); }
+.lg::before { content: ""; display: inline-block; width: 18px; margin-right: 6px; vertical-align: middle; border-top: 2px solid var(--night); }
+.lg.prev::before { border-top: 2px dashed var(--gold); }
+
+.scores { width: 100%; margin-top: 20px; border-collapse: collapse; font-size: 14px; }
+.scores th { padding: 8px 4px; border-bottom: 1px solid var(--label); font-weight: 500; color: var(--muted); text-align: left; }
+.scores td { padding: 9px 4px; border-bottom: 1px solid var(--line); }
+.scores td:nth-child(n+2), .scores th:nth-child(n+2) { text-align: right; font-family: var(--roman); }
+.dot { display: inline-block; width: 9px; height: 9px; margin-right: 10px; border-radius: 50%; vertical-align: 1px; }
+.up { color: #3f7a55; }
+.down { color: #a65a44; }
+
+/* 観測の記録 */
+.history { margin-top: 48px; }
+.history > .eyebrow { font-family: var(--sans); letter-spacing: .12em; }
+.history > .note { margin-top: 0; }
+.spark-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; margin-top: 14px; }
+.spark {
+  padding: 12px 14px 10px;
+  background: var(--white);
+  border: 1px solid var(--line);
+}
+.spark-head { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; font-size: 13px; }
+.spark-head b { font-family: var(--roman); font-size: 18px; font-weight: 700; }
+.spark-head small { margin-left: 6px; font-family: var(--roman); font-size: 12px; color: var(--label); }
+.spark svg { display: block; width: 100%; height: auto; margin-top: 6px; overflow: visible; }
+.spark .base { stroke: var(--line); stroke-width: 1; }
+.spark .line { fill: none; stroke-width: 2; stroke-linejoin: round; stroke-linecap: round; }
+
+/* これまでの一歩 */
+.steps { margin-top: 24px; }
+.steps-head { margin: 0 0 6px; font-size: 13px; letter-spacing: .08em; color: var(--muted); }
+.steps ul { margin: 0; padding: 0; list-style: none; border-top: 1px solid var(--line); }
+.steps li {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  gap: 12px;
+  align-items: baseline;
+  padding: 9px 2px;
+  border-bottom: 1px solid var(--line);
+  font-size: 13px;
+}
+.steps .s-date { font-family: var(--roman); color: var(--label); }
+.steps .s-card b { font-family: Georgia, serif; font-style: italic; font-weight: 400; font-size: 15px; margin-right: 8px; }
+.steps .s-card small { color: var(--muted); }
+.steps .s-tried { color: var(--body); }
+.steps .s-tried.yes { color: #3f7a55; }
+.steps .s-tried.none { color: var(--label); }
+
+/* 前回の一歩、やってみましたか？ */
+#followup .title { margin-top: 10px; }
+.fu-card {
+  --card-bg: #fff;
+  margin-top: 28px;
+  padding: 24px 24px 22px;
+  background: var(--card-bg);
+  border-radius: 10px;
+  text-align: center;
+}
+.fu-card.is-white { border: 1px solid var(--line); }
+.fu-title { margin: 0 0 14px; font-family: Georgia, serif; font-style: italic; font-size: 26px; color: var(--card-gold); }
+.fu-step { margin: 0; font-family: var(--serif); font-size: 16px; line-height: 2; letter-spacing: .04em; }
+.fu-options { margin-top: 28px; }
+
+.stuck { margin-top: 48px; text-align: center; }
+.stuck .eyebrow { font-family: var(--sans); letter-spacing: .12em; }
+.stuck-names { margin: 0; font-family: var(--serif); font-size: 26px; font-weight: 700; letter-spacing: .16em; }
+
+/* ---------- リフレクションカード（画像ができるまでの仮表示） ---------- */
+.card-area { margin-top: 28px; }
+.card-area .actions { justify-content: center; margin-top: 24px; }
+/* 「整える一歩を見る」でカードが裏返る */
+.card-scene { width: min(100%, 320px); margin: 0 auto; perspective: 1400px; }
+.card {
+  --card-bg: #fff;
+  position: relative;
+  height: 460px;
+  transform-style: preserve-3d;
+  transition: transform .8s cubic-bezier(.4, .1, .2, 1);
+  cursor: pointer;
+}
+.card.flipped { transform: rotateY(180deg); }
+.card.no-anim { transition: none; }
+.face {
+  position: absolute;
+  inset: 0;
+  padding: 36px 28px 28px;
+  background: var(--card-bg);
+  border-radius: 10px;
+  box-shadow: 0 6px 20px rgba(23, 33, 57, .12);
+  text-align: center;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+}
+.face.back {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  transform: rotateY(180deg);
+}
+.face.back .card-num { position: absolute; top: 36px; left: 0; right: 0; }
+.card.is-white .face { border: 1px solid var(--line); }
+.card-num {
+  margin: 0;
+  font-family: var(--roman);
+  font-size: 12px;
+  letter-spacing: .1em;
+  color: var(--card-gold);
+}
+.card-num::before { content: "✦"; display: block; font-size: 22px; line-height: 1.2; }
+.card-title {
+  margin: 6px 0 20px;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 32px;
+  font-style: italic;
+  font-weight: 400;
+  letter-spacing: .02em;
+  color: var(--card-gold);
+}
+.card-title.small { margin: 0 0 24px; font-size: 24px; }
+.card-q { margin: 0; font-family: var(--serif); font-size: 17px; line-height: 1.9; letter-spacing: .04em; }
+.card-action {
+  display: inline-block;
+  margin: 0 0 16px;
+  padding: 0 22px;
+  background: var(--card-gold);
+  color: var(--white);
+  font-family: Georgia, serif;
+  font-style: italic;
+  font-size: 14px;
+  line-height: 26px;
+}
+.card-step { margin: 0; font-family: var(--serif); font-size: 16px; line-height: 2; letter-spacing: .04em; color: var(--ink); }
+.card-domain {
+  position: absolute;
+  left: 0; right: 0; bottom: 16px;
+  margin: 0;
+  font-size: 11px;
+  letter-spacing: .2em;
+  color: var(--label);
+}
+
+/* ---------- スマートフォン ---------- */
+@media (max-width: 480px) {
+  .wrap { width: min(100% - 32px, 640px); }
+  .screen { padding-top: 40px; }
+  .title { font-size: 22px; }
+  .catch { font-size: 15px; }
+  .name { font-size: 28px; letter-spacing: .1em; }
+  .lead { font-size: 16px; }
+  .domains { gap: 8px 16px; font-size: 13px; }
+  .concept { font-size: 12px; }
+  .method { padding: 20px; }
+  .method p { font-size: 14px; }
+  .question { font-size: 19px; }
+  .scale { gap: 8px; }
+  .score { font-size: 18px; }
+  .stuck-names { font-size: 22px; }
+  .card { height: 420px; }
+  .face { padding: 30px 22px 28px; }
+  .face.back .card-num { top: 30px; }
+  .card-title { font-size: 28px; }
+  .card-q { font-size: 16px; }
+  .card-step { font-size: 15px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .card { transition: none; }
+  .progress span { transition: none; }
+}
