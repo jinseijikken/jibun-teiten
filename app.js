@@ -89,6 +89,9 @@
     $("last-info").hidden = !last;
     $("show-last").hidden = !last;
     if (last) $("last-info").textContent = "前回の観測：" + formatDate(last.date);
+    pendingDate = last && last.card && !last.tried ? last.date : null;
+    $("pending-msg").textContent = "";
+    renderPending();
     show("intro");
   }
 
@@ -234,13 +237,25 @@
     // いちばん低い領域（同点はすべて）
     const min = Math.min(...DOMAINS.map((d) => entry.scores[d.id]));
     const stuck = DOMAINS.filter((d) => entry.scores[d.id] === min);
-    $("stuck-names").textContent = stuck.map((d) => d.name).join("・");
+    // 領域の色の丸つきで表示（同点はすべて）
+    const names = $("stuck-names");
+    names.replaceChildren();
+    stuck.forEach((d) => {
+      const item = document.createElement("span");
+      item.className = "stuck-item";
+      const dot = document.createElement("span");
+      dot.className = "dot";
+      dot.style.background = d.accent;
+      item.append(dot, d.name);
+      names.append(item);
+    });
     shown = { entry, prev, stuckNames: stuck.map((d) => d.name).join("・") };
     $("save-msg").textContent = "";
+    $("try-msg").textContent = "";
 
     candidates = CARDS.map((c, i) => i).filter((i) => stuck.some((d) => d.id === CARDS[i].domain));
     currentCard = -1;
-    drawCard();
+    drawCard(entry.card); // 前に受け取ったカードがあれば、同じカードを表示する
     show("result");
   }
 
@@ -347,25 +362,38 @@
     list.replaceChildren();
     const rows = series.filter((h) => h.card && h.tried).reverse();
     $("steps").hidden = rows.length === 0;
+    // 1行目：日付・領域・答え ／ 2行目：問い ／ 3行目：一歩
     rows.forEach((h) => {
       const c = CARDS.find((x) => x.title === h.card);
+      const dm = domainById[c.domain];
       const li = document.createElement("li");
+
+      const head = document.createElement("div");
+      head.className = "s-head";
       const date = document.createElement("span");
       date.className = "s-date";
       const d = new Date(h.date);
       date.textContent = `${d.getFullYear()}.${d.getMonth() + 1}.${d.getDate()}`;
-      const card = document.createElement("span");
-      card.className = "s-card";
-      const b = document.createElement("b");
-      b.textContent = c.title;
-      const sm = document.createElement("small");
-      sm.textContent = domainById[c.domain].name;
-      card.append(b, sm);
+      const domain = document.createElement("span");
+      domain.className = "s-domain";
+      const dot = document.createElement("span");
+      dot.className = "dot";
+      dot.style.background = dm.accent;
+      domain.append(dot, dm.name);
       const tried = document.createElement("span");
       const opt = TRIED_OPTIONS.find((o) => o.id === h.tried);
       tried.className = "s-tried " + (h.tried === "yes" ? "yes" : h.tried === "skip" ? "none" : "");
       tried.textContent = h.tried === "skip" ? "—" : opt.label;
-      li.append(date, card, tried);
+      head.append(date, domain, tried);
+
+      const q = document.createElement("p");
+      q.className = "s-q";
+      q.textContent = c.q;
+      const step = document.createElement("p");
+      step.className = "s-step";
+      step.textContent = c.step;
+
+      li.append(head, q, step);
       list.append(li);
     });
   }
@@ -384,9 +412,14 @@
     }
   }
 
-  function drawCard() {
-    const pool = candidates.length > 1 ? candidates.filter((i) => i !== currentCard) : candidates;
-    currentCard = pool[Math.floor(Math.random() * pool.length)];
+  function drawCard(preferTitle) {
+    const preferred = typeof preferTitle === "string" ? CARDS.findIndex((c) => c.title === preferTitle) : -1;
+    if (preferred >= 0 && candidates.includes(preferred)) {
+      currentCard = preferred;
+    } else {
+      const pool = candidates.length > 1 ? candidates.filter((i) => i !== currentCard) : candidates;
+      currentCard = pool[Math.floor(Math.random() * pool.length)];
+    }
     const c = CARDS[currentCard];
     const d = domainById[c.domain];
     const card = $("card");
@@ -406,14 +439,87 @@
     rememberCard(c.title);
   }
 
-  // 最新の観測を表示しているときだけ、受け取ったカードを記録に残す（次回「やってみましたか？」で聞く）
+  // 最新の観測を表示しているときだけ、受け取ったカードを記録に残す
+  // （別のカードを引き直したら、前のカードの「やってみた」の記録は外す）
   function rememberCard(title) {
-    if (!shown) return;
+    const latest = latestShown();
+    if (!latest) { $("try-box").hidden = true; return; }
+    const all = loadHistory();
+    const e = all[all.length - 1];
+    if (e.card !== title) {
+      e.card = title;
+      delete e.tried;
+      saveHistory(all);
+      $("try-msg").textContent = "";
+    }
+    renderTryBox();
+  }
+
+  // 表示中の観測が、いちばん新しい観測ならその記録を返す
+  function latestShown() {
+    if (!shown) return null;
     const all = loadHistory();
     const latest = all[all.length - 1];
-    if (!latest || latest.date !== shown.entry.date || latest.tried) return;
-    latest.card = title;
+    return latest && latest.date === shown.entry.date ? latest : null;
+  }
+
+  /* ---------- 一歩をその場で記録する ---------- */
+  const QUICK_OPTIONS = TRIED_OPTIONS.filter((o) => o.id === "yes" || o.id === "partly");
+
+  function setTried(date, id) {
+    const all = loadHistory();
+    const e = all.find((h) => h.date === date);
+    if (!e) return;
+    if (id) e.tried = id; else delete e.tried;
     saveHistory(all);
+  }
+
+  // ボタンを並べる。選んだボタンをもう一度押すと取り消し
+  function renderTryButtons(container, msg, date, current, onChange) {
+    container.replaceChildren();
+    QUICK_OPTIONS.forEach((o) => {
+      const b = document.createElement("button");
+      b.type = "button";
+      b.className = "btn ghost" + (current === o.id ? " selected" : "");
+      b.setAttribute("aria-pressed", current === o.id ? "true" : "false");
+      b.textContent = o.label;
+      b.addEventListener("click", () => {
+        const next = current === o.id ? null : o.id;
+        setTried(date, next);
+        msg.textContent = next ? "記録しました。「これまでの一歩」に残ります。" : "記録を取り消しました。";
+        onChange();
+      });
+      container.append(b);
+    });
+  }
+
+  // 結果画面：「この一歩、やってみた？」
+  function renderTryBox() {
+    const latest = latestShown();
+    $("try-box").hidden = !latest;
+    if (!latest) return;
+    renderTryButtons($("try-options"), $("try-msg"), latest.date, latest.tried, () => {
+      renderTryBox();
+      renderHistory(shown.entry); // 「これまでの一歩」もすぐ更新
+    });
+  }
+
+  // はじめに画面：前回の一歩がまだ記録されていなければ表示
+  // （開いた時点で未記録なら pendingDate に覚えておき、記録した後も画面を離れるまで表示し続ける）
+  let pendingDate = null;
+  function renderPending() {
+    const box = $("pending");
+    const e = pendingDate ? loadHistory().find((h) => h.date === pendingDate) : null;
+    const c = e && e.card ? CARDS.find((x) => x.title === e.card) : null;
+    box.hidden = !c;
+    if (!c) return;
+    const d = domainById[c.domain];
+    const card = $("pending-card");
+    card.style.setProperty("--card-bg", d.bg);
+    card.classList.toggle("is-white", d.bg.toLowerCase() === "#ffffff");
+    $("pending-title").textContent = c.title;
+    $("pending-step").textContent = c.step;
+    renderTryButtons($("pending-options"), $("pending-msg"), e.date, e.tried, renderPending);
   }
 
   function toggleCard() {
@@ -428,15 +534,13 @@
     btn.disabled = true;
     msg.textContent = "画像を作っています…";
     try {
-      const c = CARDS[currentCard];
       const blob = await ResultImage.create({
         domains: DOMAINS,
         entry: shown.entry,
         prev: shown.prev,
         stuckNames: shown.stuckNames,
         max: MAX_SCORE,
-        dateText: formatDate(shown.entry.date),
-        card: { num: String(currentCard + 1).padStart(2, "0"), title: c.title, q: c.q, step: c.step, bg: domainById[c.domain].bg }
+        dateText: formatDate(shown.entry.date)
       });
       const d = new Date(shown.entry.date);
       const ymd = [d.getFullYear(), String(d.getMonth() + 1).padStart(2, "0"), String(d.getDate()).padStart(2, "0")].join("");

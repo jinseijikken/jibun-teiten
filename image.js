@@ -8,11 +8,10 @@ const ResultImage = (function () {
   const W = 1080, H = 1350;
   const C = {
     paper: "#f9f8f5", night: "#172139", ink: "#20201f", body: "#555350",
-    muted: "#6b6668", label: "#8a8273", line: "#dcd9d2", gold: "#c7aa6b", cardGold: "#ba9f50"
+    muted: "#6b6668", label: "#8a8273", line: "#dcd9d2", gold: "#c7aa6b"
   };
   const SERIF = '"Zen Old Mincho", "Yu Mincho", "Hiragino Mincho ProN", serif';
   const SANS = '"Zen Kaku Gothic New", "Yu Gothic", "Hiragino Kaku Gothic ProN", sans-serif';
-  const ITALIC = 'italic 400 {s}px Georgia, "Times New Roman", serif';
 
   // 日本語向けの簡易折り返し（1文字ずつ幅を測る。句読点・閉じ括弧は行頭に来ないようにする）
   function wrap(ctx, text, maxWidth) {
@@ -40,16 +39,6 @@ const ResultImage = (function () {
   function drawLines(ctx, lines, x, y, lineHeight) {
     lines.forEach((l, i) => ctx.fillText(l, x, y + i * lineHeight));
     return y + lines.length * lineHeight;
-  }
-
-  function roundRect(ctx, x, y, w, h, r) {
-    ctx.beginPath();
-    ctx.moveTo(x + r, y);
-    ctx.arcTo(x + w, y, x + w, y + h, r);
-    ctx.arcTo(x + w, y + h, x, y + h, r);
-    ctx.arcTo(x, y + h, x, y, r);
-    ctx.arcTo(x, y, x + w, y, r);
-    ctx.closePath();
   }
 
   function drawRadar(ctx, domains, scores, prevScores, cx, cy, R, max) {
@@ -107,7 +96,7 @@ const ResultImage = (function () {
   }
 
   /**
-   * @param {object} p { domains, entry, prev, stuckNames, card:{num,title,q,step,bg}, dateText, max }
+   * @param {object} p { domains, entry, prev, stuckNames, dateText, max }
    * @returns {Promise<Blob>}
    */
   async function create(p) {
@@ -152,58 +141,23 @@ const ResultImage = (function () {
       ctx.fillText("前回", W - 124, 160);
     }
 
-    // レーダーチャート
-    drawRadar(ctx, p.domains, p.entry.scores, p.prev && p.prev.scores, W / 2, 450, 215, p.max);
+    // レーダーチャート（カードを入れない分、大きく）
+    drawRadar(ctx, p.domains, p.entry.scores, p.prev && p.prev.scores, W / 2, 590, 300, p.max);
 
-    // いま目を向けたいところ（いちばん点数の低い領域）
+    // いま目を向けたいところ（いちばん点数の低い領域。同点が多くて長いときは小さくして折り返す）
     ctx.textAlign = "center";
     ctx.textBaseline = "alphabetic";
     ctx.fillStyle = C.muted;
-    ctx.font = `500 24px ${SANS}`;
-    ctx.fillText("いま目を向けたいところ", W / 2, 790);
+    ctx.font = `500 26px ${SANS}`;
+    ctx.fillText("いま目を向けたいところ", W / 2, 1110);
     ctx.fillStyle = C.ink;
-    ctx.font = `700 46px ${SERIF}`;
-    ctx.fillText(p.stuckNames, W / 2, 848);
-
-    // カード（問いと整える一歩をまとめて）。高さは文章の行数に合わせる
-    const cx = 120, cy = 884, cw = W - 240;
-    ctx.font = `700 30px ${SERIF}`;
-    const qLines = wrap(ctx, p.card.q, cw - 120);
-    ctx.font = `500 24px ${SANS}`;
-    const sLines = wrap(ctx, p.card.step, cw - 120);
-    const ch = 150 + qLines.length * 44 + 6 + 48 + sLines.length * 36 + 20;
-    ctx.save();
-    ctx.shadowColor = "rgba(23, 33, 57, .14)";
-    ctx.shadowBlur = 24;
-    ctx.shadowOffsetY = 8;
-    roundRect(ctx, cx, cy, cw, ch, 18);
-    ctx.fillStyle = p.card.bg;
-    ctx.fill();
-    ctx.restore();
-    if (p.card.bg.toLowerCase() === "#ffffff") {
-      roundRect(ctx, cx, cy, cw, ch, 18);
-      ctx.strokeStyle = C.line; ctx.lineWidth = 2; ctx.stroke();
+    ctx.font = `700 54px ${SERIF}`;
+    let lines = wrap(ctx, p.stuckNames, W - 160);
+    if (lines.length > 1) {
+      ctx.font = `700 38px ${SERIF}`;
+      lines = wrap(ctx, p.stuckNames, W - 160);
     }
-    ctx.fillStyle = C.cardGold;
-    ctx.font = ITALIC.replace("{s}", "44");
-    ctx.fillText(p.card.title, W / 2, cy + 66);
-    ctx.font = `400 20px Georgia, serif`;
-    ctx.fillText(p.card.num, W / 2, cy + 98);
-
-    ctx.fillStyle = C.ink;
-    ctx.font = `700 30px ${SERIF}`;
-    let y = drawLines(ctx, qLines, W / 2, cy + 150, 44);
-
-    // Action の帯
-    y += 6;
-    ctx.fillStyle = C.cardGold;
-    ctx.fillRect(W / 2 - 70, y - 26, 140, 36);
-    ctx.fillStyle = "#fff";
-    ctx.font = ITALIC.replace("{s}", "22");
-    ctx.fillText("Action", W / 2, y);
-    ctx.fillStyle = C.body;
-    ctx.font = `500 24px ${SANS}`;
-    drawLines(ctx, sLines, W / 2, y + 48, 36);
+    drawLines(ctx, lines, W / 2, lines.length > 1 ? 1170 : 1185, 54);
 
     // フッター
     ctx.fillStyle = C.label;

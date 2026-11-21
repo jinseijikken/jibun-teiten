@@ -46,7 +46,19 @@
       <div class="actions">
         <button type="button" class="btn primary" id="start">はじめる</button>
         <button type="button" class="btn ghost" id="show-last" hidden>前回の観測を見る</button>
-      </div>    </section>
+      </div>
+      <!-- 前回の一歩がまだ記録されていなければ、ここでも記録できる -->
+      <div class="pending" id="pending" hidden>
+        <p class="pending-head">前回の一歩</p>
+        <div class="fu-card" id="pending-card">
+          <p class="fu-title" id="pending-title"></p>
+          <p class="fu-step" id="pending-step"></p>
+        </div>
+        <p class="try-q">やってみたら、記録しておこう。</p>
+        <div class="try-options" id="pending-options"></div>
+        <p class="note" id="pending-msg" role="status"></p>
+      </div>
+    </section>
 
     <!-- ①' 前回の一歩、やってみましたか？（前回カードを受け取っていて、まだ答えていないときだけ） -->
     <section id="followup" class="screen" hidden>
@@ -96,16 +108,9 @@
         <tbody id="score-rows"></tbody>
       </table>
 
-      <!-- 観測の記録：領域ごとの推移（小さな折れ線を8つ） -->
-      <div class="history">
-        <p class="eyebrow">観測の記録</p>
-        <p class="note" id="history-range"></p>
-        <div class="spark-grid" id="spark-grid"></div>
-        <p class="note" id="history-empty" hidden>2回以上観測すると、ここに領域ごとの変化が表示されます。</p>
-        <div class="steps" id="steps" hidden>
-          <p class="steps-head">これまでの一歩</p>
-          <ul id="steps-list"></ul>
-        </div>
+      <div class="save-box">
+        <button type="button" class="btn ghost" id="save-image">結果を画像で保存</button>
+        <p class="note" id="save-msg" role="status"></p>
       </div>
 
       <div class="stuck">
@@ -138,11 +143,25 @@
           <button type="button" class="btn primary" id="reveal" aria-controls="card">整える一歩を見る</button>
           <button type="button" class="btn ghost" id="redraw">もう1枚引く</button>
         </div>
+        <!-- その場で記録：やったらボタンを押す（最新の観測のときだけ表示） -->
+        <div class="try-box" id="try-box" hidden>
+          <p class="try-q">この一歩、やってみた？</p>
+          <div class="try-options" id="try-options"></div>
+          <p class="note" id="try-msg" role="status"></p>
+        </div>
       </div>
 
-      <div class="save-box">
-        <button type="button" class="btn primary" id="save-image">結果を画像で保存</button>
-        <p class="note" id="save-msg" role="status"></p>
+
+      <!-- 観測の記録：領域ごとの推移（小さな折れ線を8つ） -->
+      <div class="history">
+        <p class="eyebrow">観測の記録</p>
+        <p class="note" id="history-range"></p>
+        <div class="spark-grid" id="spark-grid"></div>
+        <p class="note" id="history-empty" hidden>2回以上観測すると、ここに領域ごとの変化が表示されます。</p>
+        <div class="steps" id="steps" hidden>
+          <p class="steps-head">これまでの一歩</p>
+          <ul id="steps-list"></ul>
+        </div>
       </div>
 
       <div class="actions end">
