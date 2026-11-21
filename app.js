@@ -453,7 +453,7 @@
   // （別のカードを引き直したら、前のカードの「やってみた」の記録は外す）
   function rememberCard(title) {
     const latest = latestShown();
-    if (!latest) { $("try-box").hidden = true; return; }
+    if (!latest) { renderTryBox(); return; }
     const all = loadHistory();
     const e = all[all.length - 1];
     if (e.card !== title) {
@@ -507,6 +507,8 @@
   function renderTryBox() {
     const latest = latestShown();
     $("try-box").hidden = !latest;
+    // 「もう1枚引く」は、最新の回で、まだ一歩を記録していないときだけ出す
+    $("redraw").hidden = candidates.length < 2 || !latest || !!latest.tried;
     if (!latest) return;
     renderTryButtons($("try-options"), $("try-msg"), latest.date, latest.tried, renderTryBox);
   }
