@@ -10,6 +10,7 @@
   const STORAGE_KEY = "jinseijikken-selfcheck-v1";
   const HISTORY_MAX = 20;
   const MAX_SCORE = 15; // 1領域3問 × 5点
+  const MEMO_MAX = 1000; // 気づきメモの最大文字数
   const SVG_NS = "http://www.w3.org/2000/svg";
   // 「前回の一歩、やってみましたか？」の答え
   const TRIED_OPTIONS = [
@@ -44,6 +45,7 @@
           const e = { date: h.date, scores: h.scores };
           if (typeof h.card === "string" && CARDS.some((c) => c.title === h.card)) e.card = h.card;
           if (TRIED_OPTIONS.some((o) => o.id === h.tried)) e.tried = h.tried;
+          if (typeof h.memo === "string" && h.memo.trim()) e.memo = h.memo.slice(0, MEMO_MAX);
           return e;
         });
     } catch (e) {
@@ -61,6 +63,7 @@
 
   /* ---------- 画面切り替え ---------- */
   function show(id) {
+    flushMemo(); // 画面を切り替える前に、書きかけのメモを保存
     ["intro", "followup", "quiz", "result", "records"].forEach((s) => { $(s).hidden = s !== id; });
     // 問いの画面ではヘッダー・フッターを隠して集中できるようにする
     document.body.classList.toggle("is-quiz", id === "quiz");
@@ -202,7 +205,33 @@
   }
 
   // fromRecords：記録の画面から開いた過去の観測なら true（見出しを日付にして、戻るリンクを出す）
+  /* ---------- 気づきメモ（入力をやめて少したったら、表示中の回の記録に保存） ---------- */
+  let memoDate = null;
+  let memoTimer = null;
+  function setMemo(entry) {
+    flushMemo(); // 前に表示していた回の書きかけを保存してから切り替える
+    memoDate = entry.date;
+    $("memo").value = entry.memo || "";
+    $("memo-status").textContent = "";
+  }
+  function saveMemo() {
+    clearTimeout(memoTimer);
+    memoTimer = null;
+    if (!memoDate) return;
+    const all = loadHistory();
+    const e = all.find((h) => h.date === memoDate);
+    if (!e) return;
+    const raw = $("memo").value.slice(0, MEMO_MAX);
+    const text = raw.trim() ? raw : ""; // 空白だけなら「メモなし」
+    if ((e.memo || "") === text) return; // 変わっていなければ何もしない
+    if (text) e.memo = text; else delete e.memo;
+    saveHistory(all);
+    $("memo-status").textContent = "保存しました";
+  }
+  function flushMemo() { if (memoTimer) saveMemo(); }
+
   function renderResult(entry, prev, fromRecords) {
+    setMemo(entry);
     $("result-title").textContent = fromRecords ? `${formatDate(entry.date)}の観測` : "今回の観測";
     $("result-date").textContent = fromRecords ? "" : formatDate(entry.date);
     $("result-date").hidden = !!fromRecords;
@@ -397,6 +426,14 @@
       tried.className = "obs-tried" + (h.tried === "yes" ? " yes" : "");
       tried.textContent = opt && h.tried !== "skip" ? opt.label : "";
       btn.append(date, focus, tried);
+      if (h.memo) { // メモがある回には印
+        const m = document.createElement("span");
+        m.className = "obs-memo";
+        m.textContent = "✎";
+        m.title = "気づきメモあり";
+        m.setAttribute("aria-label", "気づきメモあり");
+        btn.append(m);
+      }
       const arrow = document.createElement("span");
       arrow.className = "obs-arrow";
       arrow.setAttribute("aria-hidden", "true");
@@ -566,6 +603,13 @@
 
   /* ---------- イベント ---------- */
   $("save-image").addEventListener("click", saveImage);
+  $("memo").addEventListener("input", () => {
+    $("memo-status").textContent = "";
+    clearTimeout(memoTimer);
+    memoTimer = setTimeout(saveMemo, 600);
+  });
+  $("memo").addEventListener("blur", saveMemo);
+  window.addEventListener("pagehide", flushMemo); // タブを閉じる・別のページへ移るとき
   $("nav-records").addEventListener("click", (e) => { e.preventDefault(); showRecords(); });
   $("records-start").addEventListener("click", startFlow);
   $("start").addEventListener("click", startFlow);

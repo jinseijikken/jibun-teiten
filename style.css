@@ -237,7 +237,6 @@ button { font: inherit; color: inherit; }
 .obs-focus { display: flex; flex-wrap: wrap; gap: 2px 12px; color: var(--ink); }
 .obs-focus .dot { margin-right: 6px; }
 .obs-arrow { flex-shrink: 0; margin-left: 4px; color: var(--gold); }
-.obs-tried:empty + .obs-arrow, .obs-focus + .obs-arrow { margin-left: auto; }
 @media (hover: hover) { .obs-item:hover { background: rgba(23, 33, 57, .04); } }
 /* 記録の画面は一覧の線で区切られているので、ボタンの上の区切り線は出さない */
 #records .actions.end { margin-top: 40px; padding-top: 0; border-top: 0; }
@@ -282,6 +281,28 @@ button { font: inherit; color: inherit; }
 }
 .stuck-item { display: inline-flex; align-items: center; }
 .stuck-item .dot { width: 14px; height: 14px; margin-right: 12px; vertical-align: middle; }
+
+/* 気づきメモ */
+.memo { max-width: 520px; margin: 32px auto 0; }
+.memo-label { display: block; margin-bottom: 8px; font-size: 13px; letter-spacing: .1em; color: var(--muted); }
+.memo textarea {
+  display: block;
+  width: 100%;
+  min-height: 96px;
+  padding: 12px 14px;
+  border: 1px solid var(--line);
+  border-radius: 0;
+  background: var(--white);
+  color: var(--ink);
+  font: inherit;
+  font-size: 16px; /* 16px 未満だと iPhone で入力時に画面が拡大されるため */
+  line-height: 1.8;
+  resize: vertical;
+}
+.memo textarea:focus { outline: none; border-color: var(--label); }
+.memo textarea::placeholder { color: #b3aea6; }
+.memo-status { min-height: 1.6em; margin: 6px 0 0; font-size: 12px; text-align: right; color: var(--label); }
+.obs-memo { flex-shrink: 0; color: var(--label); }
 
 /* ---------- リフレクションカード（画像ができるまでの仮表示） ---------- */
 .card-area { margin-top: 28px; }
