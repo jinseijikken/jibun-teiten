@@ -155,12 +155,12 @@ const ResultImage = (function () {
     // レーダーチャート
     drawRadar(ctx, p.domains, p.entry.scores, p.prev && p.prev.scores, W / 2, 450, 215, p.max);
 
-    // いま滞っているところ
+    // いま目を向けたいところ（いちばん点数の低い領域）
     ctx.textAlign = "center";
     ctx.textBaseline = "alphabetic";
     ctx.fillStyle = C.muted;
     ctx.font = `500 24px ${SANS}`;
-    ctx.fillText("いま滞っているところ", W / 2, 790);
+    ctx.fillText("いま目を向けたいところ", W / 2, 790);
     ctx.fillStyle = C.ink;
     ctx.font = `700 46px ${SERIF}`;
     ctx.fillText(p.stuckNames, W / 2, 848);
