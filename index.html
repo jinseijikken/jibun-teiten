@@ -26,7 +26,10 @@
   <header class="bar">
     <div class="wrap">
       <a class="bar-title" href="./">じぶん定点観測</a>
-      <a class="bar-site" href="https://jinseijikken.github.io/">人生実験</a>
+      <nav class="bar-nav" aria-label="メニュー">
+        <a class="bar-site" href="#records" id="nav-records">記録</a>
+        <a class="bar-site" href="https://jinseijikken.github.io/">人生実験</a>
+      </nav>
     </div>
   </header>
 
@@ -45,18 +48,6 @@
       <p class="note" id="last-info" hidden></p>
       <div class="actions">
         <button type="button" class="btn primary" id="start">はじめる</button>
-        <button type="button" class="btn ghost" id="show-last" hidden>前回の観測を見る</button>
-      </div>
-      <!-- 前回の一歩がまだ記録されていなければ、ここでも記録できる -->
-      <div class="pending" id="pending" hidden>
-        <p class="pending-head">前回の一歩</p>
-        <div class="fu-card" id="pending-card">
-          <p class="fu-title" id="pending-title"></p>
-          <p class="fu-step" id="pending-step"></p>
-        </div>
-        <p class="try-q">やってみたら、記録しておこう。</p>
-        <div class="try-options" id="pending-options"></div>
-        <p class="note" id="pending-msg" role="status"></p>
       </div>
     </section>
 
@@ -92,6 +83,8 @@
 
     <!-- ③ 結果 -->
     <section id="result" class="screen" hidden>
+      <!-- 記録の画面から過去の観測を開いたときだけ表示 -->
+      <p class="back-link" id="back-records" hidden><a href="#records">← 観測の記録へ</a></p>
       <p class="eyebrow">OBSERVATION</p>
       <h2 class="title" id="result-title">今回の観測</h2>
       <p class="note" id="result-date"></p>
@@ -99,7 +92,7 @@
       <div class="chart-box">
         <svg id="chart" viewBox="0 0 360 340" role="img" aria-label="8つの領域の点数のレーダーチャート"></svg>
         <div class="legend" id="legend" hidden>
-          <span class="lg now">今回</span><span class="lg prev">前回</span>
+          <span class="lg now" id="legend-now">今回</span><span class="lg prev">前回</span>
         </div>
       </div>
 
@@ -141,7 +134,7 @@
         </div>
         <div class="actions">
           <button type="button" class="btn primary" id="reveal" aria-controls="card">整える一歩を見る</button>
-          <button type="button" class="btn ghost" id="redraw">もう1枚引く</button>
+          <button type="button" class="btn text" id="redraw">もう1枚引く</button>
         </div>
         <!-- その場で記録：やったらボタンを押す（最新の観測のときだけ表示） -->
         <div class="try-box" id="try-box" hidden>
@@ -150,24 +143,29 @@
           <p class="note" id="try-msg" role="status"></p>
         </div>
       </div>
+    </section>
 
-
-      <!-- 観測の記録：領域ごとの推移（小さな折れ線を8つ） -->
-      <div class="history">
-        <p class="eyebrow">観測の記録</p>
+    <!-- ④ 観測の記録（ヘッダーの「記録」からいつでも開ける） -->
+    <section id="records" class="screen" hidden>
+      <p class="eyebrow">RECORDS</p>
+      <h2 class="title">観測の記録</h2>
+      <p class="note" id="records-empty" hidden>まだ観測の記録がありません。観測すると、ここに記録がたまっていきます。</p>
+      <!-- 領域ごとの推移（小さな折れ線を8つ）とこれまでの観測 -->
+      <div class="history" id="records-body">
         <p class="note" id="history-range"></p>
         <div class="spark-grid" id="spark-grid"></div>
         <p class="note" id="history-empty" hidden>2回以上観測すると、ここに領域ごとの変化が表示されます。</p>
-        <div class="steps" id="steps" hidden>
-          <p class="steps-head">これまでの一歩</p>
-          <ul id="steps-list"></ul>
+        <!-- これまでの観測：押すとその回の結果を開く -->
+        <div class="obs" id="obs">
+          <p class="obs-head">これまでの観測</p>
+          <ul id="obs-list"></ul>
         </div>
       </div>
-
       <div class="actions end">
-        <button type="button" class="btn ghost" id="restart">もう一度観測する</button>
+        <button type="button" class="btn primary" id="records-start">観測する</button>
         <button type="button" class="btn text" id="clear">保存した記録を消す</button>
-      </div>    </section>
+      </div>
+    </section>
   </main>
 
   <footer class="foot">

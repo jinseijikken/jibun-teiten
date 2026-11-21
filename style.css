@@ -38,7 +38,10 @@ button { font: inherit; color: inherit; }
 .bar { background: var(--night); color: var(--white); }
 .bar .wrap { min-height: 56px; display: flex; align-items: center; justify-content: space-between; gap: 16px; }
 .bar-site { font-family: var(--serif); font-size: 13px; letter-spacing: .12em; text-decoration: none; opacity: .8; }
-.bar-site:hover { opacity: 1; text-decoration: underline; text-underline-offset: 4px; }
+@media (hover: hover) {
+  .bar-site:hover { opacity: 1; text-decoration: underline; text-underline-offset: 4px; }
+}
+.bar-nav { display: flex; align-items: center; gap: 22px; }
 .bar-title { font-family: var(--serif); font-size: 16px; letter-spacing: .12em; text-decoration: none; }
 .bar-title:hover { opacity: .75; }
 .bar a:focus-visible { outline-color: var(--white); }
@@ -195,7 +198,7 @@ button { font: inherit; color: inherit; }
 .down { color: #a65a44; }
 
 /* 観測の記録 */
-.history { margin-top: 48px; }
+.history { margin-top: 28px; }
 .history > .eyebrow { font-family: var(--sans); letter-spacing: .12em; }
 .history > .note { margin-top: 0; }
 .spark-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; margin-top: 14px; }
@@ -211,21 +214,35 @@ button { font: inherit; color: inherit; }
 .spark .base { stroke: var(--line); stroke-width: 1; }
 .spark .line { fill: none; stroke-width: 2; stroke-linejoin: round; stroke-linecap: round; }
 
-/* これまでの一歩 */
-.steps { margin-top: 24px; }
-.steps-head { margin: 0 0 6px; font-size: 13px; letter-spacing: .08em; color: var(--muted); }
-.steps ul { margin: 0; padding: 0; list-style: none; border-top: 1px solid var(--line); }
-.steps li { padding: 14px 2px 16px; border-bottom: 1px solid var(--line); }
-.steps .s-head { display: flex; align-items: center; gap: 14px; font-size: 13px; }
-.steps .s-date { font-family: var(--roman); color: var(--label); }
-.steps .s-domain { display: inline-flex; align-items: center; color: var(--body); }
-.steps .s-domain .dot { margin-right: 6px; }
-.steps .s-tried { margin-left: auto; color: var(--body); }
-.steps .s-q { margin: 8px 0 0; font-family: var(--serif); font-size: 15px; line-height: 1.8; letter-spacing: .03em; color: var(--ink); word-break: auto-phrase; text-wrap: pretty; }
-.steps .s-step { position: relative; margin: 4px 0 0; padding-left: 1.4em; font-size: 13px; line-height: 1.8; color: var(--body); }
-.steps .s-step::before { content: "→"; position: absolute; left: 0; color: var(--gold); }
-.steps .s-tried.yes { color: #3f7a55; }
-.steps .s-tried.none { color: var(--label); }
+/* これまでの観測（押すとその回の結果へ） */
+.obs { margin-top: 28px; }
+.obs-head { margin: 0 0 6px; font-size: 13px; letter-spacing: .08em; color: var(--muted); }
+.obs-tried { flex-shrink: 0; margin-left: auto; color: var(--body); }
+.obs-tried.yes { color: #3f7a55; }
+.obs ul { margin: 0; padding: 0; list-style: none; border-top: 1px solid var(--line); }
+.obs-item {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  width: 100%;
+  padding: 13px 2px;
+  border: 0;
+  border-bottom: 1px solid var(--line);
+  background: none;
+  text-align: left;
+  font-size: 13px;
+  cursor: pointer;
+}
+.obs-date { flex-shrink: 0; color: var(--label); }
+.obs-focus { display: flex; flex-wrap: wrap; gap: 2px 12px; color: var(--ink); }
+.obs-focus .dot { margin-right: 6px; }
+.obs-arrow { flex-shrink: 0; margin-left: 4px; color: var(--gold); }
+.obs-tried:empty + .obs-arrow, .obs-focus + .obs-arrow { margin-left: auto; }
+@media (hover: hover) { .obs-item:hover { background: rgba(23, 33, 57, .04); } }
+/* 記録の画面は一覧の線で区切られているので、ボタンの上の区切り線は出さない */
+#records .actions.end { margin-top: 40px; padding-top: 0; border-top: 0; }
+.back-link { margin: 0 0 20px; font-size: 13px; }
+.back-link a { color: var(--muted); text-underline-offset: 4px; }
 
 /* 前回の一歩、やってみましたか？ */
 #followup .title { margin-top: 10px; }
@@ -247,10 +264,7 @@ button { font: inherit; color: inherit; }
 .try-q { margin: 0; font-family: var(--serif); font-size: 16px; letter-spacing: .06em; }
 .try-options { display: flex; justify-content: center; flex-wrap: wrap; gap: 10px; margin-top: 14px; }
 .btn.selected { background: var(--night); border-color: var(--night); color: var(--white); }
-.try-box .note, .pending .note { min-height: 1.9em; }
-.pending { margin-top: 40px; padding-top: 28px; border-top: 1px solid var(--line); text-align: center; }
-.pending-head { margin: 0 0 14px; font-size: 13px; letter-spacing: .12em; color: var(--muted); }
-.pending .fu-card { margin-top: 0; margin-bottom: 20px; }
+.try-box .note { min-height: 1.9em; }
 
 /* いま目を向けたいところ：大きな領域名＋色の丸 */
 .stuck { margin-top: 48px; text-align: center; }
@@ -335,6 +349,8 @@ button { font: inherit; color: inherit; }
   line-height: 26px;
 }
 .card-step { margin: 0; font-family: var(--serif); font-size: 16px; line-height: 2; letter-spacing: .04em; color: var(--ink); }
+/* カードの文章は文節の切れ目で折り返し、1〜2文字だけが次の行に残らないようにする（対応ブラウザのみ） */
+.card-q, .card-step, .fu-step { word-break: auto-phrase; text-wrap: pretty; }
 .card-domain {
   position: absolute;
   left: 0; right: 0; bottom: 16px;

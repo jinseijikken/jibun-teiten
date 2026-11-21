@@ -61,7 +61,7 @@
 
   /* ---------- 画面切り替え ---------- */
   function show(id) {
-    ["intro", "followup", "quiz", "result"].forEach((s) => { $(s).hidden = s !== id; });
+    ["intro", "followup", "quiz", "result", "records"].forEach((s) => { $(s).hidden = s !== id; });
     // 問いの画面ではヘッダー・フッターを隠して集中できるようにする
     document.body.classList.toggle("is-quiz", id === "quiz");
     window.scrollTo(0, 0);
@@ -87,11 +87,7 @@
     const history = loadHistory();
     const last = history[history.length - 1];
     $("last-info").hidden = !last;
-    $("show-last").hidden = !last;
     if (last) $("last-info").textContent = "前回の観測：" + formatDate(last.date);
-    pendingDate = last && last.card && !last.tried ? last.date : null;
-    $("pending-msg").textContent = "";
-    renderPending();
     show("intro");
   }
 
@@ -197,14 +193,21 @@
     renderResult(entry, prev);
   }
 
-  function showLast() {
-    const history = loadHistory();
-    if (!history.length) return renderIntro();
-    renderResult(history[history.length - 1], history[history.length - 2] || null);
+  // 記録の画面から、過去の観測を開く
+  function showObservation(date) {
+    const all = loadHistory();
+    const i = all.findIndex((h) => h.date === date);
+    if (i < 0) return showRecords();
+    renderResult(all[i], all[i - 1] || null, true);
   }
 
-  function renderResult(entry, prev) {
-    $("result-date").textContent = formatDate(entry.date);
+  // fromRecords：記録の画面から開いた過去の観測なら true（見出しを日付にして、戻るリンクを出す）
+  function renderResult(entry, prev, fromRecords) {
+    $("result-title").textContent = fromRecords ? `${formatDate(entry.date)}の観測` : "今回の観測";
+    $("result-date").textContent = fromRecords ? "" : formatDate(entry.date);
+    $("result-date").hidden = !!fromRecords;
+    $("back-records").hidden = !fromRecords;
+    $("legend-now").textContent = fromRecords ? "この回" : "今回";
     drawChart(entry.scores, prev && prev.scores);
     $("legend").hidden = !prev;
 
@@ -232,7 +235,6 @@
       tbody.append(tr);
     });
 
-    renderHistory(entry);
 
     // いちばん低い領域（同点はすべて）
     const min = Math.min(...DOMAINS.map((d) => entry.scores[d.id]));
@@ -295,11 +297,21 @@
   }
 
   /* ---------- 観測の記録（領域ごとの推移） ---------- */
+  // 記録の画面を開く（ヘッダーの「記録」／過去の観測の「← 観測の記録へ」から）
+  function showRecords() {
+    const all = loadHistory();
+    const last = all[all.length - 1];
+    $("records-empty").hidden = all.length > 0;
+    $("records-body").hidden = all.length === 0;
+    if (last) renderHistory(last);
+    show("records");
+  }
+
   function renderHistory(entry) {
     const all = loadHistory();
     const idx = all.findIndex((h) => h.date === entry.date);
     const series = idx >= 0 ? all.slice(0, idx + 1) : [entry]; // 表示中の観測までの記録
-    renderSteps(series);
+    renderObsList(series);
     const grid = $("spark-grid");
     grid.replaceChildren();
     const enough = series.length >= 2;
@@ -356,44 +368,42 @@
     });
   }
 
-  // これまでの一歩：受け取ったカードと「やってみたか」の記録（答えたものだけ）
-  function renderSteps(series) {
-    const list = $("steps-list");
+  // これまでの観測：新しい順に、日付と「いま目を向けたいところ」を並べる（押すとその回の結果へ）
+  function renderObsList(series) {
+    const list = $("obs-list");
     list.replaceChildren();
-    const rows = series.filter((h) => h.card && h.tried).reverse();
-    $("steps").hidden = rows.length === 0;
-    // 1行目：日付・領域・答え ／ 2行目：問い ／ 3行目：一歩
-    rows.forEach((h) => {
-      const c = CARDS.find((x) => x.title === h.card);
-      const dm = domainById[c.domain];
+    series.slice().reverse().forEach((h) => {
+      const min = Math.min(...DOMAINS.map((d) => h.scores[d.id]));
       const li = document.createElement("li");
-
-      const head = document.createElement("div");
-      head.className = "s-head";
+      const btn = document.createElement("button");
+      btn.type = "button";
+      btn.className = "obs-item";
       const date = document.createElement("span");
-      date.className = "s-date";
-      const d = new Date(h.date);
-      date.textContent = `${d.getFullYear()}.${d.getMonth() + 1}.${d.getDate()}`;
-      const domain = document.createElement("span");
-      domain.className = "s-domain";
-      const dot = document.createElement("span");
-      dot.className = "dot";
-      dot.style.background = dm.accent;
-      domain.append(dot, dm.name);
-      const tried = document.createElement("span");
+      date.className = "obs-date";
+      date.textContent = formatDate(h.date);
+      const focus = document.createElement("span");
+      focus.className = "obs-focus";
+      DOMAINS.filter((d) => h.scores[d.id] === min).forEach((d) => {
+        const item = document.createElement("span");
+        const dot = document.createElement("span");
+        dot.className = "dot";
+        dot.style.background = d.accent;
+        item.append(dot, d.name);
+        focus.append(item);
+      });
+      // その回の一歩をやったか（記録があるときだけ）
       const opt = TRIED_OPTIONS.find((o) => o.id === h.tried);
-      tried.className = "s-tried " + (h.tried === "yes" ? "yes" : h.tried === "skip" ? "none" : "");
-      tried.textContent = h.tried === "skip" ? "—" : opt.label;
-      head.append(date, domain, tried);
-
-      const q = document.createElement("p");
-      q.className = "s-q";
-      q.textContent = c.q;
-      const step = document.createElement("p");
-      step.className = "s-step";
-      step.textContent = c.step;
-
-      li.append(head, q, step);
+      const tried = document.createElement("span");
+      tried.className = "obs-tried" + (h.tried === "yes" ? " yes" : "");
+      tried.textContent = opt && h.tried !== "skip" ? opt.label : "";
+      btn.append(date, focus, tried);
+      const arrow = document.createElement("span");
+      arrow.className = "obs-arrow";
+      arrow.setAttribute("aria-hidden", "true");
+      arrow.textContent = "→";
+      btn.append(arrow);
+      btn.addEventListener("click", () => showObservation(h.date));
+      li.append(btn);
       list.append(li);
     });
   }
@@ -414,7 +424,7 @@
 
   function drawCard(preferTitle) {
     const preferred = typeof preferTitle === "string" ? CARDS.findIndex((c) => c.title === preferTitle) : -1;
-    if (preferred >= 0 && candidates.includes(preferred)) {
+    if (preferred >= 0) { // 受け取ったカードがあれば、必ずそのカードを出す
       currentCard = preferred;
     } else {
       const pool = candidates.length > 1 ? candidates.filter((i) => i !== currentCard) : candidates;
@@ -486,7 +496,7 @@
       b.addEventListener("click", () => {
         const next = current === o.id ? null : o.id;
         setTried(date, next);
-        msg.textContent = next ? "記録しました。「これまでの一歩」に残ります。" : "記録を取り消しました。";
+        msg.textContent = next ? "記録しました。" : "記録を取り消しました。";
         onChange();
       });
       container.append(b);
@@ -498,28 +508,7 @@
     const latest = latestShown();
     $("try-box").hidden = !latest;
     if (!latest) return;
-    renderTryButtons($("try-options"), $("try-msg"), latest.date, latest.tried, () => {
-      renderTryBox();
-      renderHistory(shown.entry); // 「これまでの一歩」もすぐ更新
-    });
-  }
-
-  // はじめに画面：前回の一歩がまだ記録されていなければ表示
-  // （開いた時点で未記録なら pendingDate に覚えておき、記録した後も画面を離れるまで表示し続ける）
-  let pendingDate = null;
-  function renderPending() {
-    const box = $("pending");
-    const e = pendingDate ? loadHistory().find((h) => h.date === pendingDate) : null;
-    const c = e && e.card ? CARDS.find((x) => x.title === e.card) : null;
-    box.hidden = !c;
-    if (!c) return;
-    const d = domainById[c.domain];
-    const card = $("pending-card");
-    card.style.setProperty("--card-bg", d.bg);
-    card.classList.toggle("is-white", d.bg.toLowerCase() === "#ffffff");
-    $("pending-title").textContent = c.title;
-    $("pending-step").textContent = c.step;
-    renderTryButtons($("pending-options"), $("pending-msg"), e.date, e.tried, renderPending);
+    renderTryButtons($("try-options"), $("try-msg"), latest.date, latest.tried, renderTryBox);
   }
 
   function toggleCard() {
@@ -564,7 +553,7 @@
         a.click();
         a.remove();
         setTimeout(() => URL.revokeObjectURL(url), 10000);
-        msg.textContent = "画像を保存しました。";
+        msg.textContent = "";
       }
     } catch (e) {
       msg.textContent = "画像を作れませんでした。";
@@ -575,9 +564,10 @@
 
   /* ---------- イベント ---------- */
   $("save-image").addEventListener("click", saveImage);
+  $("nav-records").addEventListener("click", (e) => { e.preventDefault(); showRecords(); });
+  $("records-start").addEventListener("click", startFlow);
   $("start").addEventListener("click", startFlow);
-  $("restart").addEventListener("click", startQuiz);
-  $("show-last").addEventListener("click", showLast);
+  $("back-records").addEventListener("click", (e) => { e.preventDefault(); showRecords(); });
   $("back").addEventListener("click", back);
   $("reveal").addEventListener("click", toggleCard);
   $("card").addEventListener("click", toggleCard); // カード自体をタップしてもめくれる
