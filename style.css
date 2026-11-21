@@ -120,8 +120,12 @@ button { font: inherit; color: inherit; }
   letter-spacing: .08em;
 }
 .btn.primary { background: var(--night); color: var(--white); }
-.btn.primary:hover { background: #26324f; }
-.btn.ghost:hover { background: rgba(23, 33, 57, .06); }
+/* ホバーの色はマウスのある端末だけ（スマホではタップ後に色が残るため） */
+@media (hover: hover) {
+  .btn.primary:hover { background: #26324f; }
+  .btn.ghost:hover { background: rgba(23, 33, 57, .06); }
+  .score:hover { background: #f1eee6; }
+}
 .btn.text { border-color: transparent; padding: 0 8px; font-size: 13px; color: var(--muted); text-decoration: underline; text-underline-offset: 4px; }
 
 /* ---------- 問い ---------- */
@@ -152,7 +156,6 @@ button { font: inherit; color: inherit; }
   cursor: pointer;
   transition: background .15s, color .15s;
 }
-.score:hover { background: #f1eee6; }
 .score.selected { background: var(--night); border-color: var(--night); color: var(--white); }
 .scale-labels { display: flex; justify-content: space-between; margin-top: 10px; font-size: 12px; color: var(--muted); }
 

@@ -168,6 +168,7 @@
     document.querySelectorAll(".score").forEach((b) => b.classList.toggle("selected", Number(b.dataset.value) === value));
     setTimeout(() => {
       busy = false;
+      if (document.activeElement && document.activeElement.blur) document.activeElement.blur(); // タップしたボタンの状態を残さない
       pos++;
       if (pos < QUESTIONS.length) renderQuestion();
       else finish();
