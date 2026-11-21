@@ -85,6 +85,20 @@ button { font: inherit; color: inherit; }
   line-height: 1.5;
   letter-spacing: .14em;
 }
+/* Beta 表示（試しながら育てている段階） */
+.beta {
+  display: inline-block;
+  margin-left: 14px;
+  padding: 3px 10px;
+  border: 1px solid var(--gold);
+  font-family: var(--roman);
+  font-size: 13px;
+  font-weight: 400;
+  line-height: 1.4;
+  letter-spacing: .1em;
+  vertical-align: middle;
+  color: #9a7d3f;
+}
 .lead { margin: 22px 0 0; font-family: var(--serif); font-size: 18px; line-height: 1.9; letter-spacing: .08em; color: var(--ink); }
 .domains {
   display: grid;
