@@ -322,7 +322,7 @@ button { font: inherit; color: inherit; }
 .bands-note { margin: 10px 0 0; font-size: var(--fs-xs); line-height: 1.8; color: var(--muted); text-align: right; }
 
 /* 結果を共有 */
-.save-box .share-url, .save-box .share-hint { max-width: 420px; margin-left: auto; margin-right: auto; }
+.save-box .share-url { max-width: 420px; margin-left: auto; margin-right: auto; }
 .share-actions { display: flex; justify-content: center; flex-wrap: wrap; gap: 10px; }
 .share-url {
   display: block;
@@ -335,7 +335,6 @@ button { font: inherit; color: inherit; }
   font: inherit;
   font-size: var(--fs-base);
 }
-.share-hint { margin: 10px 0 0; font-size: var(--fs-xs); line-height: 1.8; color: var(--muted); }
 .share-name { display: flex; align-items: center; justify-content: center; gap: 10px; max-width: 420px; margin: 0 auto 14px; }
 .share-name label { flex-shrink: 0; font-size: var(--fs-sm); letter-spacing: .06em; color: var(--body); }
 .share-name label span { color: var(--muted); }
