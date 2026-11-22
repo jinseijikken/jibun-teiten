@@ -16,6 +16,16 @@
   --serif: "Zen Old Mincho", "Yu Mincho", "YuMincho", "Hiragino Mincho ProN", serif;
   --sans: "Zen Kaku Gothic New", "Hiragino Kaku Gothic ProN", "Yu Gothic", "YuGothic", sans-serif;
   --roman: "Zen Old Mincho", Georgia, serif;
+  /* 文字の大きさ（7段階）。font-size はこの変数だけを使い、px を直接書かない
+     xs 注記・ラベル／sm 補足・ナビ・小さなボタン／base 本文・入力・ボタン／md リード・カードの問い
+     lg 問い・小見出し／xl 画面の見出し・いま目を向けたいところ／2xl ツール名 */
+  --fs-xs: 12px;
+  --fs-sm: 14px;
+  --fs-base: 16px; /* 入力欄はこれ未満にしない（iPhone で入力時に画面が拡大されるため） */
+  --fs-md: 18px;
+  --fs-lg: 22px;
+  --fs-xl: 28px;
+  --fs-2xl: 34px;
 }
 
 *, *::before, *::after { box-sizing: border-box; }
@@ -25,7 +35,7 @@ body {
   background: var(--paper);
   color: var(--ink);
   font-family: var(--sans);
-  font-size: 16px;
+  font-size: var(--fs-base);
   line-height: 1.9;
 }
 .wrap { width: min(100% - 40px, 640px); margin-inline: auto; }
@@ -37,17 +47,17 @@ button { font: inherit; color: inherit; }
 /* ---------- ヘッダー・フッター ---------- */
 .bar { background: var(--night); color: var(--white); }
 .bar .wrap { min-height: 56px; display: flex; align-items: center; justify-content: space-between; gap: 16px; }
-.bar-site { font-family: var(--serif); font-size: 13px; letter-spacing: .12em; text-decoration: none; opacity: .8; }
+.bar-site { font-family: var(--serif); font-size: var(--fs-sm); letter-spacing: .12em; text-decoration: none; opacity: .8; }
 @media (hover: hover) {
   .bar-site:hover { opacity: 1; text-decoration: underline; text-underline-offset: 4px; }
 }
 .bar-nav { display: flex; align-items: center; gap: 22px; }
-.bar-title { font-family: var(--serif); font-size: 16px; letter-spacing: .12em; text-decoration: none; }
+.bar-title { font-family: var(--serif); font-size: var(--fs-base); letter-spacing: .12em; text-decoration: none; }
 .bar-title:hover { opacity: .75; }
 .bar a:focus-visible { outline-color: var(--white); }
-.foot { padding: 40px 0 48px; color: #7a766f; font-size: 12px; text-align: center; }
-.foot a { display: inline-block; margin-bottom: 10px; font-size: 13px; text-underline-offset: 4px; }
-.foot small { display: block; font-family: var(--roman); letter-spacing: .1em; }
+.foot { padding: 40px 0 48px; color: #7a766f; font-size: var(--fs-xs); text-align: center; }
+.foot a { display: inline-block; margin-bottom: 10px; font-size: var(--fs-sm); text-underline-offset: 4px; }
+.foot small { display: block; font-family: var(--roman); font-size: var(--fs-xs); letter-spacing: .1em; }
 
 /* 結果を画像で保存 */
 .save-box { margin-top: 48px; text-align: center; }
@@ -58,7 +68,7 @@ button { font: inherit; color: inherit; }
 .eyebrow {
   margin: 0 0 14px;
   font-family: var(--roman);
-  font-size: 13px;
+  font-size: var(--fs-sm);
   line-height: 1;
   letter-spacing: .2em;
   color: var(--muted);
@@ -66,7 +76,7 @@ button { font: inherit; color: inherit; }
 .title {
   margin: 0;
   font-family: var(--serif);
-  font-size: 28px;
+  font-size: var(--fs-xl);
   font-weight: 700;
   line-height: 1.5;
   letter-spacing: .1em;
@@ -75,7 +85,7 @@ button { font: inherit; color: inherit; }
 .catch {
   margin: 0;
   font-family: var(--serif);
-  font-size: 17px;
+  font-size: var(--fs-base);
   line-height: 1.8;
   letter-spacing: .1em;
   color: var(--muted);
@@ -83,7 +93,7 @@ button { font: inherit; color: inherit; }
 .name {
   margin: 10px 0 0;
   font-family: var(--serif);
-  font-size: 34px;
+  font-size: var(--fs-2xl);
   font-weight: 700;
   line-height: 1.5;
   letter-spacing: .14em;
@@ -95,14 +105,14 @@ button { font: inherit; color: inherit; }
   padding: 3px 10px;
   border: 1px solid var(--gold);
   font-family: var(--roman);
-  font-size: 13px;
+  font-size: var(--fs-sm);
   font-weight: 400;
   line-height: 1.4;
   letter-spacing: .1em;
   vertical-align: middle;
   color: #9a7d3f;
 }
-.lead { margin: 22px 0 0; font-family: var(--serif); font-size: 18px; line-height: 1.9; letter-spacing: .08em; color: var(--ink); }
+.lead { margin: 22px 0 0; font-family: var(--serif); font-size: var(--fs-md); line-height: 1.9; letter-spacing: .08em; color: var(--ink); }
 .domains {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
@@ -120,18 +130,19 @@ button { font: inherit; color: inherit; }
   border-left: 3px solid var(--accent, var(--gold));
   background: var(--white);
 }
-.domain-name { font-size: 14px; font-weight: 500; letter-spacing: .06em; color: var(--ink); }
-.domain-desc { margin-top: 2px; font-size: 11px; line-height: 1.5; letter-spacing: .02em; color: var(--muted); }
-.score-desc { display: block; margin: 2px 0 0 19px; font-size: 11px; line-height: 1.5; color: var(--muted); }
+.domain-name { font-size: var(--fs-sm); font-weight: 500; letter-spacing: .06em; color: var(--ink); }
+.domain-desc { margin-top: 2px; font-size: var(--fs-xs); line-height: 1.5; letter-spacing: .02em; color: var(--muted); }
+.scores td:nth-child(2), .scores th { white-space: nowrap; } /* 点数・見出しを途中で折り返さない */
+.score-desc { display: block; margin: 2px 0 0 19px; font-size: var(--fs-xs); line-height: 1.5; color: var(--muted); }
 
-.note { margin: 12px 0 0; font-size: 13px; color: var(--muted); letter-spacing: .04em; }
+.note { margin: 12px 0 0; font-size: var(--fs-sm); color: var(--muted); letter-spacing: .04em; }
 .method {
   margin: 36px 0 28px;
   padding: 24px 26px;
   background: var(--white);
   border: 1px solid var(--line);
 }
-.method p { margin: 0; font-size: 15px; line-height: 2; letter-spacing: .04em; color: var(--body); }
+.method p { margin: 0; font-size: var(--fs-sm); line-height: 2; letter-spacing: .04em; color: var(--body); }
 
 .actions { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 32px; }
 .actions.end { margin-top: 56px; padding-top: 32px; border-top: 1px solid var(--line); }
@@ -150,19 +161,19 @@ button { font: inherit; color: inherit; }
   .btn.ghost:hover { background: rgba(23, 33, 57, .06); }
   .score:hover { background: #f1eee6; }
 }
-.btn.text { border-color: transparent; padding: 0 8px; font-size: 13px; color: var(--muted); text-decoration: underline; text-underline-offset: 4px; }
+.btn.text { border-color: transparent; padding: 0 8px; font-size: var(--fs-sm); color: var(--muted); text-decoration: underline; text-underline-offset: 4px; }
 
 /* ---------- 問い ---------- */
 .is-quiz .bar, .is-quiz .foot { display: none; }
 .is-quiz #quiz { padding-top: 40px; }
 .progress { height: 3px; background: var(--line); }
 .progress span { display: block; height: 100%; width: 0; background: var(--gold); transition: width .25s; }
-.count { margin: 20px 0 0; font-family: var(--roman); font-size: 14px; color: var(--label); letter-spacing: .08em; }
+.count { margin: 20px 0 0; font-family: var(--roman); font-size: var(--fs-sm); color: var(--label); letter-spacing: .08em; }
 .question {
   min-height: 5.6em;
   margin: 18px 0 32px;
   font-family: var(--serif);
-  font-size: 22px;
+  font-size: var(--fs-lg);
   font-weight: 700;
   line-height: 1.8;
   letter-spacing: .06em;
@@ -176,27 +187,27 @@ button { font: inherit; color: inherit; }
   border-radius: 50%;
   background: var(--white);
   font-family: var(--roman);
-  font-size: 20px;
+  font-size: var(--fs-md);
   cursor: pointer;
   transition: background .15s, color .15s;
 }
 .score.selected { background: var(--night); border-color: var(--night); color: var(--white); }
-.scale-labels { display: flex; justify-content: space-between; margin-top: 10px; font-size: 12px; color: var(--muted); }
+.scale-labels { display: flex; justify-content: space-between; margin-top: 10px; font-size: var(--fs-xs); color: var(--muted); }
 
 /* ---------- 結果 ---------- */
 .chart-box { margin: 28px 0 8px; padding: 12px 8px; background: var(--white); border: 1px solid var(--line); }
 #chart { display: block; width: 100%; max-width: 420px; margin: 0 auto; }
 #chart .grid { fill: none; stroke: var(--line); stroke-width: 1; }
 #chart .axis { stroke: var(--line); stroke-width: 1; }
-#chart .label { font-family: var(--sans); font-size: 13px; fill: var(--body); }
+#chart .label { font-family: var(--sans); font-size: var(--fs-sm); fill: var(--body); }
 #chart .now { fill: rgba(23, 33, 57, .14); stroke: var(--night); stroke-width: 2; stroke-linejoin: round; }
 #chart .prev { fill: none; stroke: var(--gold); stroke-width: 1.5; stroke-dasharray: 5 4; }
 #chart .pt { stroke: var(--white); stroke-width: 1.5; }
-.legend { display: flex; justify-content: center; gap: 20px; padding-bottom: 6px; font-size: 12px; color: var(--muted); }
+.legend { display: flex; justify-content: center; gap: 20px; padding-bottom: 6px; font-size: var(--fs-xs); color: var(--muted); }
 .lg::before { content: ""; display: inline-block; width: 18px; margin-right: 6px; vertical-align: middle; border-top: 2px solid var(--night); }
 .lg.prev::before { border-top: 2px dashed var(--gold); }
 
-.scores { width: 100%; margin-top: 20px; border-collapse: collapse; font-size: 14px; }
+.scores { width: 100%; margin-top: 20px; border-collapse: collapse; font-size: var(--fs-sm); }
 .scores th { padding: 8px 4px; border-bottom: 1px solid var(--label); font-weight: 500; color: var(--muted); text-align: left; }
 .scores td { padding: 9px 4px; border-bottom: 1px solid var(--line); }
 .scores td:nth-child(n+2), .scores th:nth-child(n+2) { text-align: right; font-family: var(--roman); }
@@ -214,16 +225,16 @@ button { font: inherit; color: inherit; }
   background: var(--white);
   border: 1px solid var(--line);
 }
-.spark-head { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; font-size: 13px; }
-.spark-head b { font-family: var(--roman); font-size: 18px; font-weight: 700; }
-.spark-head small { margin-left: 6px; font-family: var(--roman); font-size: 12px; color: var(--label); }
+.spark-head { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; font-size: var(--fs-sm); }
+.spark-head b { font-family: var(--roman); font-size: var(--fs-md); font-weight: 700; }
+.spark-head small { margin-left: 6px; font-family: var(--roman); font-size: var(--fs-xs); color: var(--label); }
 .spark svg { display: block; width: 100%; height: auto; margin-top: 6px; overflow: visible; }
 .spark .base { stroke: var(--line); stroke-width: 1; }
 .spark .line { fill: none; stroke-width: 2; stroke-linejoin: round; stroke-linecap: round; }
 
 /* これまでの観測（押すとその回の結果へ） */
 .obs { margin-top: 28px; }
-.obs-head { margin: 0 0 6px; font-size: 13px; letter-spacing: .08em; color: var(--muted); }
+.obs-head { margin: 0 0 6px; font-size: var(--fs-sm); letter-spacing: .08em; color: var(--muted); }
 .obs-tried { flex-shrink: 0; margin-left: auto; color: var(--body); }
 .obs-tried.yes { color: #3f7a55; }
 .obs ul { margin: 0; padding: 0; list-style: none; border-top: 1px solid var(--line); }
@@ -237,7 +248,7 @@ button { font: inherit; color: inherit; }
   border-bottom: 1px solid var(--line);
   background: none;
   text-align: left;
-  font-size: 13px;
+  font-size: var(--fs-sm);
   cursor: pointer;
 }
 .obs-date { flex-shrink: 0; color: var(--label); }
@@ -247,7 +258,7 @@ button { font: inherit; color: inherit; }
 @media (hover: hover) { .obs-item:hover { background: rgba(23, 33, 57, .04); } }
 /* 記録の画面は一覧の線で区切られているので、ボタンの上の区切り線は出さない */
 #records .actions.end { margin-top: 40px; padding-top: 0; border-top: 0; }
-.back-link { margin: 0 0 20px; font-size: 13px; }
+.back-link { margin: 0 0 20px; font-size: var(--fs-sm); }
 .back-link a { color: var(--muted); text-underline-offset: 4px; }
 
 /* 前回の一歩、やってみましたか？ */
@@ -261,20 +272,20 @@ button { font: inherit; color: inherit; }
   text-align: center;
 }
 .fu-card.is-white { border: 1px solid var(--line); }
-.fu-title { margin: 0 0 14px; font-family: Georgia, serif; font-style: italic; font-size: 26px; color: var(--card-gold); }
-.fu-step { margin: 0; font-family: var(--serif); font-size: 16px; line-height: 2; letter-spacing: .04em; }
+.fu-title { margin: 0 0 14px; font-family: Georgia, serif; font-style: italic; font-size: var(--fs-lg); color: var(--card-gold); }
+.fu-step { margin: 0; font-family: var(--serif); font-size: var(--fs-base); line-height: 2; letter-spacing: .04em; }
 .fu-options { margin-top: 28px; }
 
 /* 一歩をその場で記録 */
 .try-box { margin-top: 28px; text-align: center; }
-.try-q { margin: 0; font-family: var(--serif); font-size: 16px; letter-spacing: .06em; }
+.try-q { margin: 0; font-family: var(--serif); font-size: var(--fs-base); letter-spacing: .06em; }
 .try-options { display: flex; justify-content: center; flex-wrap: wrap; gap: 10px; margin-top: 14px; }
 .btn.selected { background: var(--night); border-color: var(--night); color: var(--white); }
 .try-box .note { min-height: 1.9em; }
 
 /* いま目を向けたいところ：大きな領域名＋色の丸 */
 .stuck { margin-top: 48px; text-align: center; }
-.stuck .eyebrow { margin-bottom: 14px; font-family: var(--sans); font-size: 14px; letter-spacing: .12em; color: var(--body); }
+.stuck .eyebrow { margin-bottom: 14px; font-family: var(--sans); font-size: var(--fs-sm); letter-spacing: .12em; color: var(--body); }
 .stuck-names {
   display: flex;
   justify-content: center;
@@ -282,33 +293,33 @@ button { font: inherit; color: inherit; }
   gap: 6px 24px;
   margin: 0;
   font-family: var(--serif);
-  font-size: 30px;
+  font-size: var(--fs-xl);
   font-weight: 700;
   letter-spacing: .14em;
 }
 .stuck-item { display: inline-flex; align-items: center; }
 .stuck-item .dot { width: 14px; height: 14px; margin-right: 12px; vertical-align: middle; }
-.stuck-names.is-calm { font-size: 22px; letter-spacing: .1em; }
-.stuck-sub { display: flex; justify-content: center; align-items: center; flex-wrap: wrap; gap: 4px 10px; margin: 12px 0 0; font-size: 14px; color: var(--body); }
+.stuck-names.is-calm { font-size: var(--fs-lg); letter-spacing: .1em; }
+.stuck-sub { display: flex; justify-content: center; align-items: center; flex-wrap: wrap; gap: 4px 10px; margin: 12px 0 0; font-size: var(--fs-sm); color: var(--body); }
 .stuck-sub .stuck-item .dot { width: 10px; height: 10px; margin-right: 6px; }
 
 /* チャートの形・読み方、点数の目安 */
-.chart-shape { margin: 14px 0 0; font-family: var(--serif); font-size: 16px; letter-spacing: .06em; text-align: center; color: var(--ink); }
-.chart-read { margin: 4px 0 0; font-size: 12px; text-align: center; color: var(--muted); }
+.chart-shape { margin: 14px 0 0; font-family: var(--serif); font-size: var(--fs-base); letter-spacing: .06em; text-align: center; color: var(--ink); }
+.chart-read { margin: 4px 0 0; font-size: var(--fs-xs); text-align: center; color: var(--muted); }
 .band {
   display: inline-block;
   margin-right: 10px;
   padding: 1px 8px;
   border-radius: 999px;
   font-family: var(--sans);
-  font-size: 11px;
+  font-size: var(--fs-xs);
   letter-spacing: .04em;
   vertical-align: 1px;
 }
 .band-high { background: #e3efe6; color: #3f7a55; }
 .band-mid { background: #efede7; color: var(--muted); }
 .band-low { background: #f6e6e2; color: #a65a44; }
-.bands-note { margin: 10px 0 0; font-size: 11px; line-height: 1.8; color: var(--muted); text-align: right; }
+.bands-note { margin: 10px 0 0; font-size: var(--fs-xs); line-height: 1.8; color: var(--muted); text-align: right; }
 
 /* 結果を共有 */
 .save-box .share-url, .save-box .share-hint { max-width: 420px; margin-left: auto; margin-right: auto; }
@@ -322,11 +333,11 @@ button { font: inherit; color: inherit; }
   background: var(--white);
   color: var(--ink);
   font: inherit;
-  font-size: 16px;
+  font-size: var(--fs-base);
 }
-.share-hint { margin: 10px 0 0; font-size: 12px; line-height: 1.8; color: var(--muted); }
+.share-hint { margin: 10px 0 0; font-size: var(--fs-xs); line-height: 1.8; color: var(--muted); }
 .share-name { display: flex; align-items: center; justify-content: center; gap: 10px; max-width: 420px; margin: 0 auto 14px; }
-.share-name label { flex-shrink: 0; font-size: 13px; letter-spacing: .06em; color: var(--body); }
+.share-name label { flex-shrink: 0; font-size: var(--fs-sm); letter-spacing: .06em; color: var(--body); }
 .share-name label span { color: var(--muted); }
 .share-name input {
   flex: 1;
@@ -337,7 +348,7 @@ button { font: inherit; color: inherit; }
   background: var(--white);
   color: var(--ink);
   font: inherit;
-  font-size: 16px; /* iPhone で入力時に拡大されないように */
+  font-size: var(--fs-base); /* iPhone で入力時に拡大されないように */
 }
 .share-name input:focus { outline: none; border-color: var(--label); }
 .share-name input::placeholder { color: #b3aea6; }
@@ -346,14 +357,14 @@ button { font: inherit; color: inherit; }
   padding: 10px 14px;
   border-left: 3px solid var(--gold);
   background: var(--white);
-  font-size: 13px;
+  font-size: var(--fs-sm);
   color: var(--body);
 }
 .shared-start { margin-top: 36px; text-align: center; }
 
 /* 気づきメモ */
 .memo { max-width: 520px; margin: 32px auto 0; }
-.memo-label { display: block; margin-bottom: 8px; font-size: 13px; letter-spacing: .1em; color: var(--muted); }
+.memo-label { display: block; margin-bottom: 8px; font-size: var(--fs-sm); letter-spacing: .1em; color: var(--muted); }
 .memo textarea {
   display: block;
   width: 100%;
@@ -364,13 +375,13 @@ button { font: inherit; color: inherit; }
   background: var(--white);
   color: var(--ink);
   font: inherit;
-  font-size: 16px; /* 16px 未満だと iPhone で入力時に画面が拡大されるため */
+  font-size: var(--fs-base); /* 16px 未満だと iPhone で入力時に画面が拡大されるため */
   line-height: 1.8;
   resize: vertical;
 }
 .memo textarea:focus { outline: none; border-color: var(--label); }
 .memo textarea::placeholder { color: #b3aea6; }
-.memo-status { min-height: 1.6em; margin: 6px 0 0; font-size: 12px; text-align: right; color: var(--label); }
+.memo-status { min-height: 1.6em; margin: 6px 0 0; font-size: var(--fs-xs); text-align: right; color: var(--label); }
 .obs-memo { flex-shrink: 0; color: var(--label); }
 
 /* ---------- リフレクションカード（画像ができるまでの仮表示） ---------- */
@@ -411,22 +422,22 @@ button { font: inherit; color: inherit; }
 .card-num {
   margin: 0;
   font-family: var(--roman);
-  font-size: 12px;
+  font-size: var(--fs-xs);
   letter-spacing: .1em;
   color: var(--card-gold);
 }
-.card-num::before { content: "✦"; display: block; font-size: 22px; line-height: 1.2; }
+.card-num::before { content: "✦"; display: block; font-size: var(--fs-lg); line-height: 1.2; }
 .card-title {
   margin: 6px 0 20px;
   font-family: Georgia, "Times New Roman", serif;
-  font-size: 32px;
+  font-size: var(--fs-xl);
   font-style: italic;
   font-weight: 400;
   letter-spacing: .02em;
   color: var(--card-gold);
 }
-.card-title.small { margin: 0 0 24px; font-size: 24px; }
-.card-q { margin: 0; font-family: var(--serif); font-size: 17px; line-height: 1.9; letter-spacing: .04em; }
+.card-title.small { margin: 0 0 24px; font-size: var(--fs-lg); }
+.card-q { margin: 0; font-family: var(--serif); font-size: var(--fs-base); line-height: 1.9; letter-spacing: .04em; }
 .card-action {
   display: inline-block;
   margin: 0 0 16px;
@@ -435,46 +446,38 @@ button { font: inherit; color: inherit; }
   color: var(--white);
   font-family: Georgia, serif;
   font-style: italic;
-  font-size: 14px;
+  font-size: var(--fs-sm);
   line-height: 26px;
 }
-.card-step { margin: 0; font-family: var(--serif); font-size: 16px; line-height: 2; letter-spacing: .04em; color: var(--ink); }
+.card-step { margin: 0; font-family: var(--serif); font-size: var(--fs-base); line-height: 2; letter-spacing: .04em; color: var(--ink); }
 /* カードの文章は文節の切れ目で折り返し、1〜2文字だけが次の行に残らないようにする（対応ブラウザのみ） */
 .card-q, .card-step, .fu-step { word-break: auto-phrase; text-wrap: pretty; }
 .card-domain {
   position: absolute;
   left: 0; right: 0; bottom: 16px;
   margin: 0;
-  font-size: 11px;
+  font-size: var(--fs-xs);
   letter-spacing: .2em;
   color: var(--label);
 }
 
 /* ---------- スマートフォン ---------- */
 @media (max-width: 480px) {
+  /* 文字の大きさ：大きい3段階だけスマホ用に小さくする */
+  :root { --fs-md: 17px; --fs-lg: 19px; --fs-xl: 24px; --fs-2xl: 28px; }
   .wrap { width: min(100% - 32px, 640px); }
   .screen { padding-top: 40px; }
-  .title { font-size: 22px; }
-  .catch { font-size: 15px; }
-  .name { font-size: 28px; letter-spacing: .1em; }
-  .lead { font-size: 16px; }
+  .name { letter-spacing: .1em; }
   .domains { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 6px; }
   .domains li { padding: 7px 9px 8px; }
   .method { padding: 20px; }
-  .method p { font-size: 14px; }
-  .question { font-size: 19px; }
   .scale { gap: 8px; }
-  .score { font-size: 18px; }
-  .stuck-names { font-size: 24px; }
   .share-actions { flex-wrap: nowrap; }
-  .share-actions .btn { flex: 1; padding: 0 10px; font-size: 15px; letter-spacing: .04em; white-space: nowrap; }
+  .share-actions .btn { flex: 1; padding: 0 10px; font-size: var(--fs-sm); letter-spacing: .04em; white-space: nowrap; }
   .stuck-item .dot { width: 12px; height: 12px; margin-right: 10px; }
   .card { height: 420px; }
   .face { padding: 30px 22px 28px; }
   .face.back .card-num { top: 30px; }
-  .card-title { font-size: 28px; }
-  .card-q { font-size: 16px; }
-  .card-step { font-size: 15px; }
 }
 
 @media (prefers-reduced-motion: reduce) {
