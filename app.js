@@ -376,7 +376,11 @@
 
     candidates = CARDS.map((c, i) => i).filter((i) => stuck.some((d) => d.id === CARDS[i].domain));
     currentCard = -1;
-    if (!shared) drawCard(entry.card); // 前に受け取ったカードがあれば、同じカードを表示する
+    // カード（今日の小さな人生実験）は「余裕が少なめ」の領域があるときだけ出す。
+    // ただし過去の回で受け取ったカードが記録にあれば、それは表示する
+    const showCard = !shared && (hasDent || !!entry.card);
+    $("card-area").hidden = !showCard;
+    if (showCard) drawCard(entry.card); // 前に受け取ったカードがあれば、同じカードを表示する
     show("result");
   }
 

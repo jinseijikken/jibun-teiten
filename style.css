@@ -384,7 +384,8 @@ button { font: inherit; color: inherit; }
 .obs-memo { flex-shrink: 0; color: var(--label); }
 
 /* ---------- リフレクションカード（画像ができるまでの仮表示） ---------- */
-.card-area { margin-top: 28px; }
+.card-area { margin-top: 48px; }
+.card-head { margin-bottom: 16px; font-family: var(--sans); font-size: var(--fs-sm); letter-spacing: .12em; text-align: center; color: var(--body); }
 .card-area .actions { justify-content: center; margin-top: 24px; }
 /* 「整える一歩を見る」でカードが裏返る */
 .card-scene { width: min(100%, 320px); margin: 0 auto; perspective: 1400px; }
