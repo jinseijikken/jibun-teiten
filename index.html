@@ -105,13 +105,17 @@
 
       <!-- 結果を共有：リンク（日付と点数だけ）／画像 -->
       <div class="save-box" id="share-box">
+        <div class="share-name">
+          <label for="share-name">名前<span>（任意）</span></label>
+          <input id="share-name" type="text" maxlength="20" placeholder="ニックネーム" autocomplete="nickname">
+        </div>
         <div class="share-actions">
           <button type="button" class="btn ghost" id="share-link">共有リンクをコピー</button>
           <button type="button" class="btn ghost" id="save-image">画像を保存</button>
         </div>
         <input class="share-url" id="share-url" type="text" readonly hidden aria-label="共有リンク">
         <p class="note" id="save-msg" role="status"></p>
-        <p class="share-hint">リンクには日付と点数だけが入ります（メモやカードは入りません）。</p>
+        <p class="share-hint">リンクには日付と点数（名前を入れたら名前も）だけが入ります。メモやカードは入りません。名前は本名ではなくニックネームがおすすめです。</p>
       </div>
 
       <div class="stuck">

@@ -127,11 +127,21 @@ const ResultImage = (function () {
     ctx.font = `500 26px ${SANS}`;
     ctx.fillText("じぶん定点観測", W - 64, 58);
 
-    // 日付
+    // 名前（任意）と日付
     ctx.textAlign = "left";
-    ctx.fillStyle = C.muted;
-    ctx.font = `500 24px ${SANS}`;
-    ctx.fillText(p.dateText, 64, 160);
+    if (p.name) {
+      ctx.fillStyle = C.ink;
+      ctx.font = `700 28px ${SERIF}`;
+      ctx.fillText(`${p.name}の観測`, 64, 160);
+      ctx.fillStyle = C.muted;
+      ctx.font = `500 22px ${SANS}`;
+      ctx.fillText(p.dateText, 64, 200);
+      ctx.font = `500 24px ${SANS}`;
+    } else {
+      ctx.fillStyle = C.muted;
+      ctx.font = `500 24px ${SANS}`;
+      ctx.fillText(p.dateText, 64, 160);
+    }
     if (p.prev) {
       // 凡例：── 今回　- - 前回
       ctx.fillStyle = C.night; ctx.fillRect(W - 310, 158, 36, 4);

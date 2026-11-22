@@ -58,7 +58,8 @@
     } catch (e) { /* 保存できない環境（プライベートモード等）では保存しない */ }
   }
   function clearHistory() {
-    try { localStorage.removeItem(STORAGE_KEY); } catch (e) { /* noop */ }
+    try { localStorage.removeItem(STORAGE_KEY); localStorage.removeItem(NAME_KEY); } catch (e) { /* noop */ }
+    $("share-name").value = "";
   }
 
   /* ---------- 画面切り替え ---------- */
@@ -234,22 +235,31 @@
   /* ---------- 共有リンク（#r=1-YYYYMMDD-8桁）：日付と点数だけを URL の # 以降に入れる ----------
      # 以降はサーバーに送られないので、点数は外部に送信されない。
      点数（3〜15）は16進数1桁（3〜f）で、DOMAINS の順に並べる。 */
-  function encodeShare(entry) {
+  // 名前（任意・20文字まで）：制御文字を除いて前後の空白を取る
+  const NAME_MAX = 20;
+  const NAME_KEY = "jinseijikken-selfcheck-name";
+  function cleanName(s) {
+    return String(s || "").replace(/[\u0000-\u001f\u007f]/g, "").trim().slice(0, NAME_MAX);
+  }
+  function encodeShare(entry, name) {
     const d = new Date(entry.date);
     const ymd = `${d.getFullYear()}${String(d.getMonth() + 1).padStart(2, "0")}${String(d.getDate()).padStart(2, "0")}`;
-    return `r=1-${ymd}-${DOMAINS.map((dm) => entry.scores[dm.id].toString(16)).join("")}`;
+    const n = cleanName(name);
+    return `r=1-${ymd}-${DOMAINS.map((dm) => entry.scores[dm.id].toString(16)).join("")}` + (n ? `-n=${encodeURIComponent(n)}` : "");
   }
   function decodeShare(hash) {
-    const m = /^#r=1-(\d{4})(\d{2})(\d{2})-([3-9a-f]{8})$/i.exec(hash || "");
+    const m = /^#r=1-(\d{4})(\d{2})(\d{2})-([3-9a-f]{8})(?:-n=([^#]*))?$/i.exec(hash || "");
     if (!m || DOMAINS.length !== 8) return null;
     const date = new Date(Number(m[1]), Number(m[2]) - 1, Number(m[3]), 12);
     if (isNaN(date) || date.getMonth() !== Number(m[2]) - 1) return null;
     const scores = {};
     DOMAINS.forEach((dm, i) => { scores[dm.id] = parseInt(m[4][i], 16); });
-    return { date: date.toISOString(), scores };
+    let name = "";
+    if (m[5]) { try { name = cleanName(decodeURIComponent(m[5])); } catch (e) { name = ""; } }
+    return { date: date.toISOString(), scores, name };
   }
   function shareUrl(entry) {
-    return location.href.split("#")[0] + "#" + encodeShare(entry);
+    return location.href.split("#")[0] + "#" + encodeShare(entry, $("share-name").value);
   }
   function clearShareHash() {
     if (location.hash) history.replaceState(null, "", location.href.split("#")[0]);
@@ -271,7 +281,7 @@
     $("memo-box").hidden = !!shared;
     $("card-area").hidden = !!shared;
     closeShareMenu();
-    $("result-title").textContent = shared ? "共有された観測" : fromRecords ? `${formatDate(entry.date)}の観測` : "今回の観測";
+    $("result-title").textContent = shared ? (entry.name ? `${entry.name}の観測` : "共有された観測") : fromRecords ? `${formatDate(entry.date)}の観測` : "今回の観測";
     $("result-date").textContent = fromRecords ? "" : formatDate(entry.date);
     $("result-date").hidden = !!fromRecords;
     $("back-records").hidden = !fromRecords;
@@ -607,7 +617,8 @@
         prev: shown.prev,
         stuckNames: shown.stuckNames,
         max: MAX_SCORE,
-        dateText: formatDate(shown.entry.date)
+        dateText: formatDate(shown.entry.date),
+        name: cleanName($("share-name").value)
       });
       const d = new Date(shown.entry.date);
       const ymd = [d.getFullYear(), String(d.getMonth() + 1).padStart(2, "0"), String(d.getDate()).padStart(2, "0")].join("");
@@ -673,6 +684,14 @@
 
   /* ---------- イベント ---------- */
   $("share-link").addEventListener("click", shareLink);
+  // 名前はこのブラウザに覚えておき、次回も入った状態にする
+  try { $("share-name").value = cleanName(localStorage.getItem(NAME_KEY)); } catch (e) { /* noop */ }
+  $("share-name").addEventListener("input", () => {
+    try {
+      const n = cleanName($("share-name").value);
+      if (n) localStorage.setItem(NAME_KEY, n); else localStorage.removeItem(NAME_KEY);
+    } catch (e) { /* noop */ }
+  });
   $("shared-start").addEventListener("click", () => { clearShareHash(); sharedMode = false; renderIntro(); });
   window.addEventListener("hashchange", () => {
     const e = decodeShare(location.hash);

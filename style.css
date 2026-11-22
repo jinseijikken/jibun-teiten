@@ -297,6 +297,22 @@ button { font: inherit; color: inherit; }
   font-size: 16px;
 }
 .share-hint { margin: 10px 0 0; font-size: 12px; line-height: 1.8; color: var(--muted); }
+.share-name { display: flex; align-items: center; justify-content: center; gap: 10px; max-width: 420px; margin: 0 auto 14px; }
+.share-name label { flex-shrink: 0; font-size: 13px; letter-spacing: .06em; color: var(--body); }
+.share-name label span { color: var(--muted); }
+.share-name input {
+  flex: 1;
+  min-width: 0;
+  max-width: 260px;
+  padding: 9px 12px;
+  border: 1px solid var(--line);
+  background: var(--white);
+  color: var(--ink);
+  font: inherit;
+  font-size: 16px; /* iPhone で入力時に拡大されないように */
+}
+.share-name input:focus { outline: none; border-color: var(--label); }
+.share-name input::placeholder { color: #b3aea6; }
 .shared-note {
   margin: 14px 0 0;
   padding: 10px 14px;
