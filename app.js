@@ -64,6 +64,7 @@
   /* ---------- 画面切り替え ---------- */
   function show(id) {
     flushMemo(); // 画面を切り替える前に、書きかけのメモを保存
+    if (id !== "result" && sharedMode) { sharedMode = false; clearShareHash(); } // 共有された観測から離れたら URL を元に戻す
     ["intro", "followup", "quiz", "result", "records"].forEach((s) => { $(s).hidden = s !== id; });
     // 問いの画面ではヘッダー・フッターを隠して集中できるようにする
     document.body.classList.toggle("is-quiz", id === "quiz");
@@ -230,9 +231,47 @@
   }
   function flushMemo() { if (memoTimer) saveMemo(); }
 
-  function renderResult(entry, prev, fromRecords) {
-    setMemo(entry);
-    $("result-title").textContent = fromRecords ? `${formatDate(entry.date)}の観測` : "今回の観測";
+  /* ---------- 共有リンク（#r=1-YYYYMMDD-8桁）：日付と点数だけを URL の # 以降に入れる ----------
+     # 以降はサーバーに送られないので、点数は外部に送信されない。
+     点数（3〜15）は16進数1桁（3〜f）で、DOMAINS の順に並べる。 */
+  function encodeShare(entry) {
+    const d = new Date(entry.date);
+    const ymd = `${d.getFullYear()}${String(d.getMonth() + 1).padStart(2, "0")}${String(d.getDate()).padStart(2, "0")}`;
+    return `r=1-${ymd}-${DOMAINS.map((dm) => entry.scores[dm.id].toString(16)).join("")}`;
+  }
+  function decodeShare(hash) {
+    const m = /^#r=1-(\d{4})(\d{2})(\d{2})-([3-9a-f]{8})$/i.exec(hash || "");
+    if (!m || DOMAINS.length !== 8) return null;
+    const date = new Date(Number(m[1]), Number(m[2]) - 1, Number(m[3]), 12);
+    if (isNaN(date) || date.getMonth() !== Number(m[2]) - 1) return null;
+    const scores = {};
+    DOMAINS.forEach((dm, i) => { scores[dm.id] = parseInt(m[4][i], 16); });
+    return { date: date.toISOString(), scores };
+  }
+  function shareUrl(entry) {
+    return location.href.split("#")[0] + "#" + encodeShare(entry);
+  }
+  function clearShareHash() {
+    if (location.hash) history.replaceState(null, "", location.href.split("#")[0]);
+  }
+
+  let sharedMode = false; // 共有リンクの結果を表示中か
+  function renderShared(entry) {
+    renderResult(entry, null, false, true);
+  }
+
+  // fromRecords：記録の画面から開いた過去の観測 ／ shared：共有リンクから開いた観測（記録しない・カードやメモは出さない）
+  function renderResult(entry, prev, fromRecords, shared) {
+    sharedMode = !!shared;
+    if (!shared) clearShareHash();
+    if (shared) { flushMemo(); memoDate = null; } else setMemo(entry);
+    $("shared-note").hidden = !shared;
+    $("shared-start-box").hidden = !shared;
+    $("share-box").hidden = !!shared;
+    $("memo-box").hidden = !!shared;
+    $("card-area").hidden = !!shared;
+    closeShareMenu();
+    $("result-title").textContent = shared ? "共有された観測" : fromRecords ? `${formatDate(entry.date)}の観測` : "今回の観測";
     $("result-date").textContent = fromRecords ? "" : formatDate(entry.date);
     $("result-date").hidden = !!fromRecords;
     $("back-records").hidden = !fromRecords;
@@ -286,7 +325,7 @@
 
     candidates = CARDS.map((c, i) => i).filter((i) => stuck.some((d) => d.id === CARDS[i].domain));
     currentCard = -1;
-    drawCard(entry.card); // 前に受け取ったカードがあれば、同じカードを表示する
+    if (!shared) drawCard(entry.card); // 前に受け取ったカードがあれば、同じカードを表示する
     show("result");
   }
 
@@ -601,7 +640,54 @@
     }
   }
 
+  /* ---------- 結果を共有（メニュー：リンク／画像） ---------- */
+  const canShareLink = () => window.matchMedia("(pointer: coarse)").matches && !!navigator.share;
+  function closeShareMenu() {
+    $("share-menu").hidden = true;
+    $("share-toggle").setAttribute("aria-expanded", "false");
+    $("share-url").hidden = true;
+    $("save-msg").textContent = "";
+  }
+  function toggleShareMenu() {
+    const open = $("share-menu").hidden;
+    closeShareMenu();
+    if (!open) return;
+    $("share-link").textContent = canShareLink() ? "リンクを共有" : "リンクをコピー";
+    $("share-menu").hidden = false;
+    $("share-toggle").setAttribute("aria-expanded", "true");
+  }
+  async function shareLink() {
+    if (!shown) return;
+    const url = shareUrl(shown.entry);
+    const msg = $("save-msg");
+    msg.textContent = "";
+    // スマホ：共有メニュー（LINE・メッセージなど）
+    if (canShareLink()) {
+      try { await navigator.share({ title: "じぶん定点観測", url }); return; }
+      catch (e) { if (e && e.name === "AbortError") return; }
+    }
+    // PC：クリップボードにコピー（できない環境では、リンクを表示して選んでもらう）
+    try {
+      await navigator.clipboard.writeText(url);
+      msg.textContent = "リンクをコピーしました。";
+    } catch (e) {
+      const input = $("share-url");
+      input.value = url;
+      input.hidden = false;
+      input.focus();
+      input.select();
+      msg.textContent = "リンクを選んでコピーしてください。";
+    }
+  }
+
   /* ---------- イベント ---------- */
+  $("share-toggle").addEventListener("click", toggleShareMenu);
+  $("share-link").addEventListener("click", shareLink);
+  $("shared-start").addEventListener("click", () => { clearShareHash(); sharedMode = false; renderIntro(); });
+  window.addEventListener("hashchange", () => {
+    const e = decodeShare(location.hash);
+    if (e) renderShared(e);
+  });
   $("save-image").addEventListener("click", saveImage);
   $("memo").addEventListener("input", () => {
     $("memo-status").textContent = "";
@@ -634,5 +720,8 @@
     if (v >= 1 && v <= 5) answer(v);
   });
 
-  renderIntro();
+  // 共有リンクから開いたら、その結果を表示。それ以外はホーム
+  const sharedEntry = decodeShare(location.hash);
+  if (sharedEntry) renderShared(sharedEntry);
+  else { clearShareHash(); renderIntro(); }
 })();

@@ -88,6 +88,8 @@
       <p class="eyebrow">OBSERVATION</p>
       <h2 class="title" id="result-title">今回の観測</h2>
       <p class="note" id="result-date"></p>
+      <!-- 共有リンクから開いたときだけ表示 -->
+      <p class="shared-note" id="shared-note" hidden>共有された観測です。あなたの記録には保存されません。</p>
 
       <div class="chart-box">
         <svg id="chart" viewBox="0 0 360 340" role="img" aria-label="8つの領域の点数のレーダーチャート"></svg>
@@ -101,8 +103,17 @@
         <tbody id="score-rows"></tbody>
       </table>
 
-      <div class="save-box">
-        <button type="button" class="btn ghost" id="save-image">結果を画像で保存</button>
+      <!-- 結果を共有：リンク（日付と点数だけ）／画像 -->
+      <div class="save-box" id="share-box">
+        <button type="button" class="btn ghost" id="share-toggle" aria-expanded="false" aria-controls="share-menu">結果を共有</button>
+        <div class="share-menu" id="share-menu" hidden>
+          <div class="share-actions">
+            <button type="button" class="btn text" id="share-link">リンクをコピー</button>
+            <button type="button" class="btn text" id="save-image">画像を保存</button>
+          </div>
+          <input class="share-url" id="share-url" type="text" readonly hidden aria-label="共有リンク">
+          <p class="share-hint">リンクには日付と点数だけが入ります（メモやカードは入りません）。リンクを知っている人は誰でもこの結果を見られます。</p>
+        </div>
         <p class="note" id="save-msg" role="status"></p>
       </div>
 
@@ -112,14 +123,19 @@
       </div>
 
       <!-- 気づきメモ：書くと自動でこの回の記録に保存（このブラウザの中だけ） -->
-      <div class="memo">
+      <!-- 共有リンクから開いたときだけ表示 -->
+      <div class="shared-start" id="shared-start-box" hidden>
+        <button type="button" class="btn primary" id="shared-start">自分も観測してみる</button>
+      </div>
+
+      <div class="memo" id="memo-box">
         <label class="memo-label" for="memo">気づきメモ</label>
         <textarea id="memo" rows="3" maxlength="1000" placeholder="点数を見て感じたこと、思い当たること など"></textarea>
         <p class="memo-status" id="memo-status" role="status"></p>
       </div>
 
       <!-- リフレクションカード：画像ができたら差し替え予定 -->
-      <div class="card-area">
+      <div class="card-area" id="card-area">
         <div class="card-scene">
           <article class="card" id="card">
             <!-- 表：問い -->
