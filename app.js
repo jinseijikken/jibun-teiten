@@ -14,7 +14,6 @@
   // 点数の目安：12〜15 満ちている／9〜11 ほどほど／3〜8 余裕が少なめ
   const LOW_MAX = 8;
   const HIGH_MIN = 12;
-  const ROUND_DIFF = 3; // 最高点と最低点の差がこれ以下なら「まるい形」
   const bandOf = (v) => (v >= HIGH_MIN ? { id: "high", label: "満ちている" } : v <= LOW_MAX ? { id: "low", label: "余裕が少なめ" } : { id: "mid", label: "ほどほど" });
   const SVG_NS = "http://www.w3.org/2000/svg";
   // 「前回の一歩、やってみましたか？」の答え
@@ -284,7 +283,7 @@
     sharedMode = !!shared;
     if (!shared) clearShareHash();
     if (shared) { flushMemo(); memoDate = null; } else setMemo(entry);
-    $("shared-note").hidden = !shared;
+    $("stuck-box").hidden = !!shared; // 共有された観測では「いま目を向けたいところ」を出さない
     $("shared-start-box").hidden = !shared;
     $("share-box").hidden = !!shared;
     $("memo-box").hidden = !!shared;
@@ -336,15 +335,9 @@
     // いちばん低い領域（同点はすべて）
     const vals = DOMAINS.map((d) => entry.scores[d.id]);
     const min = Math.min(...vals);
-    const max = Math.max(...vals);
     const stuck = DOMAINS.filter((d) => entry.scores[d.id] === min);
     const stuckNames = stuck.map((d) => d.name).join("・");
     const hasDent = min <= LOW_MAX; // 「余裕が少なめ」（3〜8点）の領域があるか
-
-    // チャートの形（評価はせず、形だけ）
-    $("chart-shape").textContent = max - min <= ROUND_DIFF
-      ? "8つの領域の差が小さく、まるい形です。"
-      : `${stuckNames}が少しへこんだ形です。`;
 
     // いま目を向けたいところ：余裕が少なめの領域があればその領域を、なければ「大きなへこみはありません」
     const dotItem = (d) => {

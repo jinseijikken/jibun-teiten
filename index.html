@@ -87,8 +87,6 @@
       <p class="eyebrow">OBSERVATION</p>
       <h2 class="title" id="result-title">今回の観測</h2>
       <p class="note" id="result-date"></p>
-      <!-- 共有リンクから開いたときだけ表示 -->
-      <p class="shared-note" id="shared-note" hidden>共有された観測です。あなたの記録には保存されません。</p>
 
       <div class="chart-box">
         <svg id="chart" viewBox="0 0 360 340" role="img" aria-label="8つの領域の点数のレーダーチャート"></svg>
@@ -96,9 +94,6 @@
           <span class="lg now" id="legend-now">今回</span><span class="lg prev">前回</span>
         </div>
       </div>
-      <!-- チャートの読み方と、形の説明（評価はせず、形だけを言う） -->
-      <p class="chart-shape" id="chart-shape"></p>
-      <p class="chart-read">外側ほど「そう思う」が多い領域です。</p>
 
       <table class="scores">
         <thead><tr><th scope="col">領域</th><th scope="col">点数</th><th scope="col" id="th-diff">前回比</th></tr></thead>
@@ -119,7 +114,7 @@
         <input class="share-url" id="share-url" type="text" readonly hidden aria-label="共有リンク">
         <p class="note" id="save-msg" role="status"></p>      </div>
 
-      <div class="stuck">
+      <div class="stuck" id="stuck-box">
         <p class="eyebrow">いま目を向けたいところ</p>
         <p class="stuck-names" id="stuck-names"></p>
         <!-- 3〜8点の領域がないとき：「大きなへこみはありません」の下に、いちばん低い領域を小さく -->
