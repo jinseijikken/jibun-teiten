@@ -105,22 +105,24 @@ button { font: inherit; color: inherit; }
 .lead { margin: 22px 0 0; font-family: var(--serif); font-size: 18px; line-height: 1.9; letter-spacing: .08em; color: var(--ink); }
 .domains {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 10px 22px;
-  margin: 18px 0 0;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 8px;
+  margin: 20px 0 0;
   padding: 0;
   list-style: none;
-  font-size: 14px;
-  letter-spacing: .06em;
-  color: var(--body);
 }
-.domains li { display: flex; flex-direction: column; }
-.domain-name { color: var(--ink); }
-.domain-desc { padding-left: 17px; font-size: 12px; line-height: 1.6; letter-spacing: .02em; color: var(--muted); }
-.domains .dot { margin-right: 8px; }
-.scores td:nth-child(2), .scores th { white-space: nowrap; }
+/* 領域の色の枠で囲んだ小さなカード */
+.domains li {
+  display: flex;
+  flex-direction: column;
+  padding: 8px 10px 9px;
+  border: 1px solid var(--line);
+  border-left: 3px solid var(--accent, var(--gold));
+  background: var(--white);
+}
+.domain-name { font-size: 14px; font-weight: 500; letter-spacing: .06em; color: var(--ink); }
+.domain-desc { margin-top: 2px; font-size: 11px; line-height: 1.5; letter-spacing: .02em; color: var(--muted); }
 .score-desc { display: block; margin: 2px 0 0 19px; font-size: 11px; line-height: 1.5; color: var(--muted); }
-.concept { margin: 20px 0 0; font-size: 13px; line-height: 1.9; letter-spacing: .04em; color: var(--muted); }
 
 .note { margin: 12px 0 0; font-size: 13px; color: var(--muted); letter-spacing: .04em; }
 .method {
@@ -456,8 +458,8 @@ button { font: inherit; color: inherit; }
   .catch { font-size: 15px; }
   .name { font-size: 28px; letter-spacing: .1em; }
   .lead { font-size: 16px; }
-  .domains { grid-template-columns: 1fr; gap: 8px; font-size: 14px; }
-  .concept { font-size: 12px; }
+  .domains { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 6px; }
+  .domains li { padding: 7px 9px 8px; }
   .method { padding: 20px; }
   .method p { font-size: 14px; }
   .question { font-size: 19px; }

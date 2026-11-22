@@ -86,12 +86,10 @@
   // 8つの領域を、結果画面と同じ色の丸つきで並べる
   DOMAINS.forEach((d) => {
     const li = document.createElement("li");
-    const dot = document.createElement("span");
-    dot.className = "dot";
-    dot.style.background = d.accent;
+    li.style.setProperty("--accent", d.accent); // カードの左の線を領域の色に
     const name = document.createElement("span");
     name.className = "domain-name";
-    name.append(dot, d.name);
+    name.textContent = d.name;
     const desc = document.createElement("span");
     desc.className = "domain-desc";
     desc.textContent = d.desc || "";
