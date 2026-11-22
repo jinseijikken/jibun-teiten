@@ -5,17 +5,18 @@
 
 // 領域（並びはレーダーチャートの順）
 // bg：リフレクションカードの背景色 / accent：その色を濃くした領域の色（チャート・点数表で使用）
+// icon：ホームの領域カードのアイコン（Material Symbols の名前。index.html の icon_names にも足すこと）
 // desc：領域の意味（ホームの一覧と点数表に表示）
 // name：画面に出す名前（2026-11-21 わかりやすい名前に変更。元の分類名は orig）
 const DOMAINS = [
-  { id: "body",    name: "からだ", desc: "体力・睡眠・食事など、体の調子",     orig: "肉体",   bg: "#f9dbd9", accent: "#c05f59" },
-  { id: "economy", name: "お金", desc: "暮らしのお金と、ゆとり",       orig: "経済性", bg: "#fae7d6", accent: "#c08959" },
-  { id: "family",  name: "身近な人", desc: "家族や親しい人との安心できる関係",   orig: "家族",   bg: "#fdf1d7", accent: "#c0a059" },
-  { id: "social",  name: "人づきあい", desc: "まわりの人や場所とのつながり", orig: "社会性", bg: "#e2eed6", accent: "#7ea35a" },
-  { id: "intel",   name: "学び", desc: "知ること・考えること・成長の実感",       orig: "知性",   bg: "#d3e5e5", accent: "#5a9e9e" },
-  { id: "work",    name: "仕事", desc: "仕事や活動の意味とペース",       orig: "仕事",   bg: "#d6e2fc", accent: "#5b80c4" },
-  { id: "ethics",  name: "価値観", desc: "大切にしたいことを大切にできているか",     orig: "倫理",   bg: "#c9ccef", accent: "#6b67bf" },
-  { id: "spirit",  name: "生き方", desc: "生きている意味や納得感",     orig: "精神",   bg: "#ffffff", accent: "#8c8c8c" }  // 白いカードのため灰色
+  { id: "body",    name: "からだ", icon: "accessibility_new", desc: "体力・睡眠・食事など、体の調子",     orig: "肉体",   bg: "#f9dbd9", accent: "#c05f59" },
+  { id: "economy", name: "お金", icon: "savings", desc: "暮らしのお金と、ゆとり",       orig: "経済性", bg: "#fae7d6", accent: "#c08959" },
+  { id: "family",  name: "身近な人", icon: "home", desc: "家族や親しい人との安心できる関係",   orig: "家族",   bg: "#fdf1d7", accent: "#c0a059" },
+  { id: "social",  name: "人づきあい", icon: "groups", desc: "まわりの人や場所とのつながり", orig: "社会性", bg: "#e2eed6", accent: "#7ea35a" },
+  { id: "intel",   name: "学び", icon: "menu_book", desc: "知ること・考えること・成長の実感",       orig: "知性",   bg: "#d3e5e5", accent: "#5a9e9e" },
+  { id: "work",    name: "仕事", icon: "work", desc: "仕事や活動の意味とペース",       orig: "仕事",   bg: "#d6e2fc", accent: "#5b80c4" },
+  { id: "ethics",  name: "価値観", icon: "diamond", desc: "大切にしたいことを大切にできているか",     orig: "倫理",   bg: "#c9ccef", accent: "#6b67bf" },
+  { id: "spirit",  name: "生き方", icon: "explore", desc: "生きている意味や納得感",     orig: "精神",   bg: "#ffffff", accent: "#8c8c8c" }  // 白いカードのため灰色
 ];
 
 // 問い（1〜5点で回答）

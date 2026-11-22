@@ -126,11 +126,21 @@ button { font: inherit; color: inherit; }
   display: flex;
   flex-direction: column;
   padding: 8px 10px 9px;
-  border: 1px solid var(--line);
-  border-left: 3px solid var(--accent, var(--gold));
+  border: 1px solid var(--line); /* 色はアイコンが担うので、枠線は灰色 */
   background: var(--white);
 }
-.domain-name { font-size: var(--fs-sm); font-weight: 500; letter-spacing: .06em; color: var(--ink); }
+.domain-name { display: flex; align-items: center; gap: 6px; font-size: var(--fs-sm); font-weight: 500; letter-spacing: .06em; color: var(--ink); }
+/* アイコン：領域の色。書体が読み込まれる前に名前の文字（"savings" など）が見えて崩れないよう、幅を固定して隠す */
+.domain-icon {
+  flex-shrink: 0;
+  width: 20px;
+  height: 20px;
+  overflow: hidden;
+  font-size: 20px;
+  line-height: 1;
+  letter-spacing: 0;
+  color: var(--accent, var(--gold));
+}
 .domain-desc { margin-top: 2px; font-size: var(--fs-xs); line-height: 1.5; letter-spacing: .02em; color: var(--muted); }
 .scores td:nth-child(2), .scores th { white-space: nowrap; } /* 点数・見出しを途中で折り返さない */
 .score-desc { display: block; margin: 2px 0 0 19px; font-size: var(--fs-xs); line-height: 1.5; color: var(--muted); }

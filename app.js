@@ -88,7 +88,14 @@
     li.style.setProperty("--accent", d.accent); // カードの左の線を領域の色に
     const name = document.createElement("span");
     name.className = "domain-name";
-    name.textContent = d.name;
+    if (d.icon) { // Material Symbols のアイコン（飾りなので読み上げない）
+      const ic = document.createElement("span");
+      ic.className = "material-symbols-outlined domain-icon";
+      ic.setAttribute("aria-hidden", "true");
+      ic.textContent = d.icon;
+      name.append(ic);
+    }
+    name.append(d.name);
     const desc = document.createElement("span");
     desc.className = "domain-desc";
     desc.textContent = d.desc || "";
