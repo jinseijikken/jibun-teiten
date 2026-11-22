@@ -161,13 +161,23 @@ const ResultImage = (function () {
     ctx.font = `500 26px ${SANS}`;
     ctx.fillText("いま目を向けたいところ", W / 2, 1110);
     ctx.fillStyle = C.ink;
-    ctx.font = `700 54px ${SERIF}`;
-    let lines = wrap(ctx, p.stuckNames, W - 160);
-    if (lines.length > 1) {
-      ctx.font = `700 38px ${SERIF}`;
-      lines = wrap(ctx, p.stuckNames, W - 160);
+    if (p.hasDent === false) {
+      // 3〜8点の領域がないとき：「大きなへこみはありません」＋いちばん低い領域を小さく
+      ctx.font = `700 44px ${SERIF}`;
+      ctx.fillText("大きなへこみはありません", W / 2, 1180);
+      ctx.fillStyle = C.body;
+      ctx.font = `500 26px ${SANS}`;
+      const subLines = wrap(ctx, `いちばん低いのは ${p.stuckNames}（${p.min}点）`, W - 160);
+      drawLines(ctx, subLines.slice(0, 2), W / 2, 1232, 36);
+    } else {
+      ctx.font = `700 54px ${SERIF}`;
+      let lines = wrap(ctx, p.stuckNames, W - 160);
+      if (lines.length > 1) {
+        ctx.font = `700 38px ${SERIF}`;
+        lines = wrap(ctx, p.stuckNames, W - 160);
+      }
+      drawLines(ctx, lines, W / 2, lines.length > 1 ? 1170 : 1185, 54);
     }
-    drawLines(ctx, lines, W / 2, lines.length > 1 ? 1170 : 1185, 54);
 
     // フッター
     ctx.fillStyle = C.label;

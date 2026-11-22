@@ -97,11 +97,15 @@
           <span class="lg now" id="legend-now">今回</span><span class="lg prev">前回</span>
         </div>
       </div>
+      <!-- チャートの読み方と、形の説明（評価はせず、形だけを言う） -->
+      <p class="chart-shape" id="chart-shape"></p>
+      <p class="chart-read">外側ほど「そう思う」が多い領域です。</p>
 
       <table class="scores">
         <thead><tr><th scope="col">領域</th><th scope="col">点数</th><th scope="col" id="th-diff">前回比</th></tr></thead>
         <tbody id="score-rows"></tbody>
       </table>
+      <p class="bands-note">12〜15点：満ちている　9〜11点：ほどほど　3〜8点：余裕が少なめ</p>
 
       <!-- 結果を共有：リンク（日付と点数だけ）／画像 -->
       <div class="save-box" id="share-box">
@@ -121,6 +125,8 @@
       <div class="stuck">
         <p class="eyebrow">いま目を向けたいところ</p>
         <p class="stuck-names" id="stuck-names"></p>
+        <!-- 3〜8点の領域がないとき：「大きなへこみはありません」の下に、いちばん低い領域を小さく -->
+        <p class="stuck-sub" id="stuck-sub" hidden></p>
       </div>
 
       <!-- 気づきメモ：書くと自動でこの回の記録に保存（このブラウザの中だけ） -->

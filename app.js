@@ -11,6 +11,11 @@
   const HISTORY_MAX = 20;
   const MAX_SCORE = 15; // 1領域3問 × 5点
   const MEMO_MAX = 1000; // 気づきメモの最大文字数
+  // 点数の目安：12〜15 満ちている／9〜11 ほどほど／3〜8 余裕が少なめ
+  const LOW_MAX = 8;
+  const HIGH_MIN = 12;
+  const ROUND_DIFF = 3; // 最高点と最低点の差がこれ以下なら「まるい形」
+  const bandOf = (v) => (v >= HIGH_MIN ? { id: "high", label: "満ちている" } : v <= LOW_MAX ? { id: "low", label: "余裕が少なめ" } : { id: "mid", label: "ほどほど" });
   const SVG_NS = "http://www.w3.org/2000/svg";
   // 「前回の一歩、やってみましたか？」の答え
   const TRIED_OPTIONS = [
@@ -84,7 +89,13 @@
     const dot = document.createElement("span");
     dot.className = "dot";
     dot.style.background = d.accent;
-    li.append(dot, d.name);
+    const name = document.createElement("span");
+    name.className = "domain-name";
+    name.append(dot, d.name);
+    const desc = document.createElement("span");
+    desc.className = "domain-desc";
+    desc.textContent = d.desc || "";
+    li.append(name, desc);
     $("domain-list").append(li);
   });
 
@@ -300,8 +311,18 @@
       dot.className = "dot";
       dot.style.background = d.accent;
       name.append(dot, d.name);
+      if (d.desc) {
+        const ds = document.createElement("span");
+        ds.className = "score-desc";
+        ds.textContent = d.desc;
+        name.append(ds);
+      }
       const sc = document.createElement("td");
-      sc.textContent = entry.scores[d.id] + " / " + MAX_SCORE;
+      const band = bandOf(entry.scores[d.id]);
+      const chip = document.createElement("span");
+      chip.className = "band band-" + band.id;
+      chip.textContent = band.label;
+      sc.append(chip, entry.scores[d.id] + " / " + MAX_SCORE);
       tr.append(name, sc);
       if (prev) {
         const diff = entry.scores[d.id] - prev.scores[d.id];
@@ -315,21 +336,43 @@
 
 
     // いちばん低い領域（同点はすべて）
-    const min = Math.min(...DOMAINS.map((d) => entry.scores[d.id]));
+    const vals = DOMAINS.map((d) => entry.scores[d.id]);
+    const min = Math.min(...vals);
+    const max = Math.max(...vals);
     const stuck = DOMAINS.filter((d) => entry.scores[d.id] === min);
-    // 領域の色の丸つきで表示（同点はすべて）
-    const names = $("stuck-names");
-    names.replaceChildren();
-    stuck.forEach((d) => {
+    const stuckNames = stuck.map((d) => d.name).join("・");
+    const hasDent = min <= LOW_MAX; // 「余裕が少なめ」（3〜8点）の領域があるか
+
+    // チャートの形（評価はせず、形だけ）
+    $("chart-shape").textContent = max - min <= ROUND_DIFF
+      ? "8つの領域の差が小さく、まるい形です。"
+      : `${stuckNames}が少しへこんだ形です。`;
+
+    // いま目を向けたいところ：余裕が少なめの領域があればその領域を、なければ「大きなへこみはありません」
+    const dotItem = (d) => {
       const item = document.createElement("span");
       item.className = "stuck-item";
       const dot = document.createElement("span");
       dot.className = "dot";
       dot.style.background = d.accent;
       item.append(dot, d.name);
-      names.append(item);
-    });
-    shown = { entry, prev, stuckNames: stuck.map((d) => d.name).join("・") };
+      return item;
+    };
+    const names = $("stuck-names");
+    const sub = $("stuck-sub");
+    names.replaceChildren();
+    sub.replaceChildren();
+    names.classList.toggle("is-calm", !hasDent);
+    sub.hidden = hasDent;
+    if (hasDent) {
+      stuck.forEach((d) => names.append(dotItem(d)));
+    } else {
+      names.textContent = "大きなへこみはありません";
+      sub.append("いちばん低いのは ");
+      stuck.forEach((d) => sub.append(dotItem(d)));
+      sub.append(`（${min}点）`);
+    }
+    shown = { entry, prev, stuckNames, hasDent, min };
     $("save-msg").textContent = "";
     $("try-msg").textContent = "";
 
@@ -616,6 +659,8 @@
         entry: shown.entry,
         prev: shown.prev,
         stuckNames: shown.stuckNames,
+        hasDent: shown.hasDent,
+        min: shown.min,
         max: MAX_SCORE,
         dateText: formatDate(shown.entry.date),
         name: cleanName($("share-name").value)

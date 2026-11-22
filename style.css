@@ -105,8 +105,8 @@ button { font: inherit; color: inherit; }
 .lead { margin: 22px 0 0; font-family: var(--serif); font-size: 18px; line-height: 1.9; letter-spacing: .08em; color: var(--ink); }
 .domains {
   display: grid;
-  grid-template-columns: repeat(4, max-content);
-  gap: 8px 22px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px 22px;
   margin: 18px 0 0;
   padding: 0;
   list-style: none;
@@ -114,7 +114,12 @@ button { font: inherit; color: inherit; }
   letter-spacing: .06em;
   color: var(--body);
 }
+.domains li { display: flex; flex-direction: column; }
+.domain-name { color: var(--ink); }
+.domain-desc { padding-left: 17px; font-size: 12px; line-height: 1.6; letter-spacing: .02em; color: var(--muted); }
 .domains .dot { margin-right: 8px; }
+.scores td:nth-child(2), .scores th { white-space: nowrap; }
+.score-desc { display: block; margin: 2px 0 0 19px; font-size: 11px; line-height: 1.5; color: var(--muted); }
 .concept { margin: 20px 0 0; font-size: 13px; line-height: 1.9; letter-spacing: .04em; color: var(--muted); }
 
 .note { margin: 12px 0 0; font-size: 13px; color: var(--muted); letter-spacing: .04em; }
@@ -281,6 +286,27 @@ button { font: inherit; color: inherit; }
 }
 .stuck-item { display: inline-flex; align-items: center; }
 .stuck-item .dot { width: 14px; height: 14px; margin-right: 12px; vertical-align: middle; }
+.stuck-names.is-calm { font-size: 22px; letter-spacing: .1em; }
+.stuck-sub { display: flex; justify-content: center; align-items: center; flex-wrap: wrap; gap: 4px 10px; margin: 12px 0 0; font-size: 14px; color: var(--body); }
+.stuck-sub .stuck-item .dot { width: 10px; height: 10px; margin-right: 6px; }
+
+/* チャートの形・読み方、点数の目安 */
+.chart-shape { margin: 14px 0 0; font-family: var(--serif); font-size: 16px; letter-spacing: .06em; text-align: center; color: var(--ink); }
+.chart-read { margin: 4px 0 0; font-size: 12px; text-align: center; color: var(--muted); }
+.band {
+  display: inline-block;
+  margin-right: 10px;
+  padding: 1px 8px;
+  border-radius: 999px;
+  font-family: var(--sans);
+  font-size: 11px;
+  letter-spacing: .04em;
+  vertical-align: 1px;
+}
+.band-high { background: #e3efe6; color: #3f7a55; }
+.band-mid { background: #efede7; color: var(--muted); }
+.band-low { background: #f6e6e2; color: #a65a44; }
+.bands-note { margin: 10px 0 0; font-size: 11px; line-height: 1.8; color: var(--muted); text-align: right; }
 
 /* 結果を共有 */
 .save-box .share-url, .save-box .share-hint { max-width: 420px; margin-left: auto; margin-right: auto; }
@@ -430,7 +456,7 @@ button { font: inherit; color: inherit; }
   .catch { font-size: 15px; }
   .name { font-size: 28px; letter-spacing: .1em; }
   .lead { font-size: 16px; }
-  .domains { gap: 8px 16px; font-size: 13px; }
+  .domains { grid-template-columns: 1fr; gap: 8px; font-size: 14px; }
   .concept { font-size: 12px; }
   .method { padding: 20px; }
   .method p { font-size: 14px; }
