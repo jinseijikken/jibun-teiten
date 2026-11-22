@@ -640,21 +640,12 @@
     }
   }
 
-  /* ---------- 結果を共有（メニュー：リンク／画像） ---------- */
+  /* ---------- 結果を共有（共有リンク／画像） ---------- */
   const canShareLink = () => window.matchMedia("(pointer: coarse)").matches && !!navigator.share;
-  function closeShareMenu() {
-    $("share-menu").hidden = true;
-    $("share-toggle").setAttribute("aria-expanded", "false");
+  function closeShareMenu() { // 結果を表示し直すたびに、前回のリンク表示とメッセージを消す
     $("share-url").hidden = true;
     $("save-msg").textContent = "";
-  }
-  function toggleShareMenu() {
-    const open = $("share-menu").hidden;
-    closeShareMenu();
-    if (!open) return;
-    $("share-link").textContent = canShareLink() ? "リンクを共有" : "リンクをコピー";
-    $("share-menu").hidden = false;
-    $("share-toggle").setAttribute("aria-expanded", "true");
+    $("share-link").textContent = canShareLink() ? "リンクを送る" : "共有リンクをコピー";
   }
   async function shareLink() {
     if (!shown) return;
@@ -681,7 +672,6 @@
   }
 
   /* ---------- イベント ---------- */
-  $("share-toggle").addEventListener("click", toggleShareMenu);
   $("share-link").addEventListener("click", shareLink);
   $("shared-start").addEventListener("click", () => { clearShareHash(); sharedMode = false; renderIntro(); });
   window.addEventListener("hashchange", () => {

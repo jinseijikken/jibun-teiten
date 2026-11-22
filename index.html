@@ -105,16 +105,13 @@
 
       <!-- 結果を共有：リンク（日付と点数だけ）／画像 -->
       <div class="save-box" id="share-box">
-        <button type="button" class="btn ghost" id="share-toggle" aria-expanded="false" aria-controls="share-menu">結果を共有</button>
-        <div class="share-menu" id="share-menu" hidden>
-          <div class="share-actions">
-            <button type="button" class="btn text" id="share-link">リンクをコピー</button>
-            <button type="button" class="btn text" id="save-image">画像を保存</button>
-          </div>
-          <input class="share-url" id="share-url" type="text" readonly hidden aria-label="共有リンク">
-          <p class="share-hint">リンクには日付と点数だけが入ります（メモやカードは入りません）。リンクを知っている人は誰でもこの結果を見られます。</p>
+        <div class="share-actions">
+          <button type="button" class="btn ghost" id="share-link">共有リンクをコピー</button>
+          <button type="button" class="btn ghost" id="save-image">画像を保存</button>
         </div>
+        <input class="share-url" id="share-url" type="text" readonly hidden aria-label="共有リンク">
         <p class="note" id="save-msg" role="status"></p>
+        <p class="share-hint">リンクには日付と点数だけが入ります（メモやカードは入りません）。</p>
       </div>
 
       <div class="stuck">
